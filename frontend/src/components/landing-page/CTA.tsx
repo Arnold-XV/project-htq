@@ -1,6 +1,18 @@
+'use client';
+import { useRouter } from "next/dist/client/components/navigation";
 import Image from "next/image";
 
 export default function CTA() {
+  const router = useRouter();
+
+  const handleTestClick = () => {
+    const isLoggedIn = false;
+    if (isLoggedIn) {
+      router.push("/mulai-test");
+    } else {
+      router.push("/login");
+    }
+  };  
   return (
     <section className="px-6 md:px-16 py-20 bg-[var(--color-background)] text-[var(--foreground)] text-center font-plus-jakarta">
       {/* Kotak dengan background image */}
@@ -23,7 +35,8 @@ export default function CTA() {
             Lorem ipsum dolor sit amet consectetur. Amet non id massa neque. Ullamcorper cras morbi faucibus egestas enim dignissim tincidunt.
           </p>
 
-          <button className="mt-8 bg-[var(--foreground)] text-white px-13 py-2.5 rounded-lg cursor-pointer hover:bg-[var(--color-primary-700)] shadow-lg text-sm">
+          <button className="mt-8 bg-[var(--foreground)] text-white px-13 py-2.5 rounded-lg cursor-pointer hover:bg-[var(--color-primary-700)] shadow-lg text-sm"
+          onClick={handleTestClick}>
             Mulai Test
           </button>
         </div>
