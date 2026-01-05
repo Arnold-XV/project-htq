@@ -59,6 +59,7 @@
   --color-error-900: #7a271a;
 
   --color-tosca: #3d9f8e;
+  --color-primary-button: #003B33;
   --color-neutral-200-400: #ffbd59;
   --color-background-1: #8db39e;
   --color-background-2: #beded0;
@@ -75,3 +76,8 @@ body {
   color: var(--foreground);
   font-family: var(--font-plus-jakarta), sans-serif;
 }
+
+.font-cormorant {
+  font-family: var(--font-cormorant), serif;
+}
+
