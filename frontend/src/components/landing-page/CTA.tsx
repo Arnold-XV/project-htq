@@ -15,19 +15,17 @@ export default function CTA() {
   };  
   return (
     <section className="px-6 md:px-16 py-20 bg-[var(--color-background)] text-[var(--foreground)] text-center font-plus-jakarta">
-      {/* Kotak dengan background image */}
       <div className="relative max-w-8xl mx-auto rounded-3xl overflow-hidden shadow-xl">
-        {/* Background image */}
         <Image
           src="/hero-bg.jpg"
           alt="Background"
           fill
-          className="object-cover object-[center_70%]"
+          className="object-cover object-[center_60%] md:object-[center_70%]"
         />
         <div className="absolute inset-0 bg-[var(--color-tosca)] opacity-60"></div>
 
         <div className="relative p-10 md:p-10 rounded-3xl">
-          <h2 className="text-2xl md:text-5xl font-cormorant font-extrabold max-w-2xl mx-auto">
+          <h2 className="text-[1.8rem] md:text-5xl font-cormorant font-extrabold max-w-2xl mx-auto">
             Sudah siap mengenal diri?
           </h2>
 

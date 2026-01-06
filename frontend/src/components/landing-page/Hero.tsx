@@ -1,24 +1,37 @@
+'use client';
 import { ArrowRight } from "react-feather";
 import Image from "next/image";
+import { useRouter } from "next/dist/client/components/navigation";
 
 export default function Hero() {
+  const router = useRouter();
+  
+    const handleTestClick = () => {
+      const isLoggedIn = false;
+      if (isLoggedIn) {
+        router.push("/mulai-test");
+      } else {
+        router.push("/login");
+      }
+    };
+
   return (
-    <section className="relative w-full h-[60vh] md:h-screen px-6 md:px-16 py-20 md:py-28 text-center overflow-hidden">
+    <section className="relative w-full h-screen px-6 md:px-16 py-20 md:py-28 text-center overflow-hidden">
       
       {/* Hero Image */}
-      <div className="absolute top-0 left-0 w-full h-[120%] overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-[118%] overflow-hidden">
         <Image
           src="/hero-bg.jpg"
           alt="Hero"
           fill
-          className="object-fill"
+          className="object-cover object-center scale-x-170 -translate-y-5 md:object-fill md:scale-100 md:-translate-y-0"
           style={{ objectPosition: 'top' }}
         />
       </div>
       <div className="absolute inset-0 bg-[var(--color-tosca)] opacity-60"></div>
 
       {/* Konten */}
-      <div className="relative z-10 text-[var(--foreground)] mt-30">
+      <div className="relative z-10 text-[var(--foreground)] mt-55 md:mt-30">
         <span className="font-semibold inline-block 
                  bg-[var(--color-background-2)]/60 text-sm px-5 py-1 rounded-xl
                  shadow-[0_1px_10px_rgba(190,237,208,0.5),0_1px_35px_rgba(190,237,208,0.5)]
@@ -36,12 +49,13 @@ export default function Hero() {
           kecenderungan kepribadian melalui kerangka 30 Juz Al-Qur’an
         </p>
 
-        <div className="font-plus-jakarta mt-8 flex flex-col md:flex-row justify-center gap-7 font-semibold">
-          <button className="bg-[var(--color-primary-button)] text-white px-4 py-2 rounded-lg shadow-lg hover:bg-[var(--color-primary-700)] cursor-pointer">
+        <div className="font-plus-jakarta mt-8 flex flex-col flex-row justify-center gap-6 font-semibold">
+          <button className="bg-[var(--color-primary-button)] text-white px-4 py-2 rounded-lg shadow-lg hover:bg-[var(--color-primary-700)] cursor-pointer"
+          onClick={handleTestClick}>
             Mulai Test <ArrowRight className="inline-block ml-2" />
           </button>
           <button className="border border-[var(--foreground)] px-4 py-2 rounded-lg shadow-lg hover:bg-[var(--color-primary-300)] cursor-pointer text-[var(--foreground)]">
-            Learn More
+            Tentang HTQ
           </button>
         </div>
       </div>

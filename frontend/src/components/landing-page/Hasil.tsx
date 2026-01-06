@@ -21,17 +21,25 @@ const hasil = [
 
 const Hasil = () => {
   return (
-    <section className="py-16 md:py-24 bg-white text-black">
+    <section className="py-5 px-3 md:py-24 bg-white text-black">
       <div className="container mx-auto px-4 md:px-6">
-        <h2 className="text-4xl text-center mb-10" style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 800 }}>
+        <h2 className="text-3xl lg:text-4xl text-center mb-10" style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 800 }}>
         Hasil yang Kamu Dapatkan
         </h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 max-w-[80rem] mx-auto items-center">
-          {/* Left - Result Items */}
-          <div className="space-y-5 max-w-[45rem]">
+          <div className="flex justify-center lg:justify-end lg:order-2">
+            <Image
+              src="/hasil-4.png"
+              alt="Hasil Card Preview"
+              width={500}
+              height={500}
+              className="mb-10 lg:mb-0" //"rounded-2xl shadow-lg border border-gray-200"
+            />
+          </div>
+          <div className="space-y-5 max-w-[45rem] lg:order-1">
             {hasil.map((item, index) => (
-              <div key={index} className="flex gap-8 items-end">
+              <div key={index} className="flex gap-5 md:gap-8 items-end">
                 <Image 
                 src={item.image} 
                 alt={item.title} 
@@ -47,7 +55,6 @@ const Hasil = () => {
             ))}
           </div>
 
-          {/* Right - Result Card Preview */}
           {/* {{{<div className="bg-card rounded-2xl shadow-card border border-border overflow-hidden">
             <div className="bg-primary p-4 text-primary-foreground">
               <div className="text-sm font-medium mb-1">Juz Kepribadian: EHNL</div>
@@ -112,15 +119,7 @@ const Hasil = () => {
             </div>
           </div>*/}
 
-          <div className="flex justify-center lg:justify-end mt-10 lg:mt-0">
-            <Image
-              src="/hasil-4.png"
-              alt="Hasil Card Preview"
-              width={500}
-              height={500}
-              //className="rounded-2xl shadow-lg border border-gray-200"
-            />
-          </div>
+          
           
         </div>
       </div>

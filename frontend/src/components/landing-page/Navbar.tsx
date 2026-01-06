@@ -1,10 +1,12 @@
 'use client';
-import { Globe } from "react-feather";
+import { Globe, Menu, X } from "react-feather";
 import Image from "next/image";
 import { useRouter } from "next/dist/client/components/navigation";
+import { useState } from "react";
 
 export default function Navbar() {
   const router = useRouter();
+  const [open, setOpen] = useState(false);
 
   const handleTestClick = () => {
     const isLoggedIn = false;
@@ -13,45 +15,78 @@ export default function Navbar() {
     } else {
       router.push("/login");
     }
+    setOpen(false);
   };
 
   return (
     <nav className="fixed w-full z-50 px-6 py-10">
-      <div className="mx-auto flex max-w-[98rem] items-center justify-between rounded-xl bg-[var(--color-background)] px-6 py-2 shadow-sm">
-        
-        {/* LEFT */}
-        <div className="flex items-center gap-5">
-          <Image
-            src="/htq-logo.png"
-            alt="Logo"
-            width={40}
-            height={40}
-          />
-          <div className="text-lg leading-tight font-cormorant font-extrabold text-[var(--foreground)]">
-            <p>Yayasan Halaqah</p>
-            <p>Tadarus Al-Qur&apos;an</p>
+      <div className="mx-auto max-w-[98rem] rounded-lg md:rounded-xl bg-[var(--color-background)] px-4 md:px-6 py-2 shadow-sm">
+        <div className="flex items-center justify-between">
+          
+          {/* LEFT */}
+          <div className={`flex items-center gap-3 md:gap-5 ${open ? 'mt-3' : ''}`}>
+            <Image src="/htq-logo.png" alt="HTQ Logo" width={40} height={40} />
+            <div className="text-lg leading-tight font-cormorant font-extrabold text-[var(--foreground)]">
+              <p>Yayasan Halaqah</p>
+              <p>Tadarus Al-Qur&apos;an</p>
+            </div>
           </div>
+
+          {/* DESKTOP RIGHT */}
+          <div className="hidden md:flex items-center gap-10 text-sm">
+            <div className="flex items-center gap-3 font-semibold">
+              <button
+                className="rounded-lg border border-[var(--color-neutral-300)] px-5 py-2 shadow-sm hover:bg-[var(--color-primary-300)] cursor-pointer text-[var(--foreground)]"
+                onClick={handleTestClick}
+              >
+                Log in
+              </button>
+              <button
+                className="rounded-lg bg-[var(--color-primary-button)] px-6 py-2 text-white hover:bg-[var(--color-primary-700)] shadow-sm cursor-pointer"
+                onClick={handleTestClick}
+              >
+                Mulai Test
+              </button>
+            </div>
+
+            <div className="flex items-center gap-1.5 text-lg font-medium cursor-pointer text-[var(--foreground)]">
+              <Globe size={25} />
+              <span>ID</span>
+            </div>
+          </div>
+
+          {/* HAMBURGER*/}
+          <button
+            className="md:hidden text-[var(--foreground)]"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <X size={27} /> : <Menu size={27} />}
+          </button>
         </div>
 
-        {/* RIGHT */}
-        <div className="flex items-center gap-10 text-sm">
-          <div className="flex items-center gap-3 font-semibold">
-            <button className="rounded-lg border border-[var(--color-neutral-300)] px-5 py-2 shadow-sm hover:bg-[var(--color-primary-300)] cursor-pointer text-[var(--foreground)]"
-            onClick={handleTestClick}>
+        {/* MOBILE MENU */}
+        {open && (
+          <div className="mt-5 flex flex-col gap-4 font-semibold md:hidden text-sm">
+            <div className="flex items-center justify-center gap-2 text-base text-[var(--foreground)]">
+              <Globe size={22} />
+              <span>ID</span>
+            </div>
+            <button
+              className="rounded-lg border border-[var(--color-neutral-300)] px-5 py-2 shadow-sm text-[var(--foreground)]"
+              onClick={handleTestClick}
+            >
               Log in
             </button>
-            <button className="rounded-lg bg-[var(--color-primary-button)] px-6 py-2 text-white hover:bg-[var(--color-primary-700)] shadow-sm cursor-pointer"
-            onClick={handleTestClick}>
+            <button
+              className="rounded-lg bg-[var(--color-primary-button)] px-6 py-2 text-white shadow-sm mb-3"
+              onClick={handleTestClick}
+            >
               Mulai Test
             </button>
+
           </div>
-          
-          <div className="flex items-center gap-1.5 text-lg font-medium cursor-pointer text-[var(--foreground)]">
-            <Globe size={25} color="currentColor" />
-            <span>ID</span>
-          </div>
-        </div>
+        )}
       </div>
     </nav>
-  )
+  );
 }
