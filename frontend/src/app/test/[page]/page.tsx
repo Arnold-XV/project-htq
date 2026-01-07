@@ -2,8 +2,14 @@
 
 import React from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useQuestions } from "../../../../components/questions-provider";
+import { useQuestions } from "../../../components/test-page/questions-provider";
 import questions from "../../../../data/dummy-questions.json";
+import { ArrowLeft, ArrowRight, ChevronLeft } from "lucide-react";
+import { Button } from "../../../components/ui/button";
+import Link from "next/link";
+import BackButton from "../../../components/test-page/back-button";
+import NextButton from "../../../components/test-page/next-button";
+import ProgressBar from "../../../components/test-page/progress-bar";
 
 export default function TestPage() {
   const params = useParams();
@@ -34,48 +40,74 @@ export default function TestPage() {
     const key = q.id ?? start + idx;
     return answers?.[key] !== undefined && answers?.[key] !== "";
   });
+
+  const totalPages = Math.ceil(questions.length / perPage);
   return (
     <div>
-      <h2>Halaman {page}</h2>
-      <div className="space-y-6">
-        {pageQs.map((q, idx) => {
-          const key = q.id ?? start + idx;
-          return (
-            <fieldset key={key} className="border-b pb-4">
-              <legend className="mb-2 font-medium">{q.text}</legend>
-              <div className="flex gap-4">
-                {(q.options ?? []).map((opt: string) => (
-                  <label key={opt} className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name={`q-${key}`}
-                      value={opt}
-                      checked={answers?.[key] === opt}
-                      onChange={() => setAnswer(key, opt)}
-                    />
-                    <span>{opt}</span>
-                  </label>
-                ))}
+      <Link href="/">
+        <Button className="bg-neutral-25 text-neutral-800 rounded-[8px] lg:ml-14.5 ml:4.5 mt-25.25 mb-8">
+          <ChevronLeft className="mr-2" />
+          <p className="text-sm text-neutral-800 font-bold">Keluar</p>
+        </Button>
+      </Link>
+
+      <div className="overflow-hidden">
+        <div className="lg:mx-36.75 mx-4.5 flex flex-col">
+          <ProgressBar currentPage={page} totalPages={totalPages}></ProgressBar>
+
+          {pageQs.map((q, idx) => {
+            const key = q.id ?? start + idx;
+            return (
+              <div key={key} className="pt-12 ">
+                <div className="py-9.25 lg:px-15.25 px-5.5 bg-neutral-25 border-0.5 border-neutral-100 rounded-[15px] shadow-xs">
+                  <legend className="mb-5.5 font-bold lg:text-[18px] text-sm">
+                    {q.text}
+                  </legend>
+                  <div className="grid lg:grid-cols-2 grid-cols-1 gap-4 auto-rows-fr">
+                    {(q.options ?? []).map((opt: string) => {
+                      const clicked = answers?.[key] === opt;
+                      return (
+                        <label
+                          key={opt}
+                          className={`flex items-center gap-2 h-full px-5 py-2.5 rounded-[10px] border border-neutral-400 cursor-pointer hover:bg-[#BEDED066]  ${
+                            clicked ? "bg-[#BEDED066]" : ""
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name={`q-${key}`}
+                            value={opt}
+                            checked={answers?.[key] === opt}
+                            onChange={() => setAnswer(key, opt)}
+                            className={`w-6 h-6 flex-shrink-0  ${
+                              clicked ? "accent-background-2" : ""
+                            }`}
+                          />
+                          <span className="lg:text-[18px] text-sm">{opt}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
-            </fieldset>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-      <div className="mt-6 flex gap-3">
-        <button
-          onClick={prev}
-          disabled={page === 1}
-          className="px-4 py-2 rounded bg-gray-200 disabled:opacity-50"
-        >
-          Kembali
-        </button>
-        <button
-          onClick={next}
-          disabled={!allAnswered}
-          className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
-        >
-          {page < Math.ceil(questions.length / perPage) ? "Lanjut" : "Selesai"}
-        </button>
+      <div className="bg-neutral-25 border-1 border-neutral-100 mt-15">
+        <div className="mt-6 flex flex-row justify-between lg:mx-19.25 mx-4.5 gap-3">
+          <BackButton prev={prev} page={page} />
+          <NextButton
+            next={next}
+            allAnswered={allAnswered}
+            page={page}
+            questions={questions}
+            perPage={perPage}
+          />
+        </div>
+        <p className="text-center text-sm text-neutral-500 mt-2 mb-3.75">
+          Jawab semua pertanyaan terlebih dahulu
+        </p>
       </div>
     </div>
   );
