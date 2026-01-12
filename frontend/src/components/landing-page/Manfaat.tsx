@@ -21,7 +21,7 @@ const manfaat = [
 export default function Manfaat() {
   return (
     <section className="px-6 md:px-16 py-16 bg-[var(--color-background)] text-[var(--foreground)]">
-      <h2 className="text-4xl text-center mb-10 font-cormorant font-extrabold">
+      <h2 className="text-4xl text-center mb-10 font-cormorant font-extrabold autoshow">
         Manfaat Tes
       </h2>
 
@@ -29,17 +29,17 @@ export default function Manfaat() {
         {manfaat.map((item, idx) => (
           <div
             key={idx}
-            className="border border-[var(--color-neutral-200)] rounded-xl p-6 text-center shadow-sm"
+            className="border border-[var(--color-neutral-200)] rounded-xl p-6 text-center shadow-sm fadeup"
           >
             <Image 
               src={item.image} 
               alt={item.title} 
-              className="mx-auto mb-4 mt-4 object-contain"
+              className="mx-auto mb-4 object-contain"
               width={100}
               height={100}
             />
-            <h3 className="font-plus-jakarta font-bold text-lg mb-2">{item.title}</h3>
-            <p className="font-plus-jakarta text-base text-[var(--foreground)] mb-4">{item.desc}</p>
+            <h3 className="font-plus-jakarta font-semibold md:font-bold text-lg mb-2">{item.title}</h3>
+            <p className="font-plus-jakarta text-sm md:text-base text-[var(--foreground)] mb-4">{item.desc}</p>
           </div>
         ))}
       </div>

@@ -1,19 +1,10 @@
 'use client';
-import { ArrowRight } from "react-feather";
+import { FaArrowRight } from "react-icons/fa";
 import Image from "next/image";
 import { useRouter } from "next/dist/client/components/navigation";
 
 export default function Hero() {
   const router = useRouter();
-  
-    const handleTestClick = () => {
-      const isLoggedIn = false;
-      if (isLoggedIn) {
-        router.push("/mulai-test");
-      } else {
-        router.push("/login");
-      }
-    };
 
   return (
     <section className="relative w-full h-screen px-6 md:px-16 py-20 md:py-28 text-center overflow-hidden">
@@ -40,21 +31,21 @@ export default function Hero() {
           Durasi 5–10 menit
         </span>
 
-        <h1 className="mt-6 text-3xl md:text-5xl max-w-xl mx-auto leading-tight font-cormorant font-bold">
+        <h1 className="mt-6 text-[1.75rem] md:text-5xl max-w-xl mx-auto leading-tight font-cormorant font-bold">
           Kenali Kepribadian Qur’ani yang Membentuk Dirimu
         </h1>
 
         <p className="font-plus-jakarta mt-2 max-w-2xl mx-auto text-sm md:text-lg text-[var(--foreground)]">
-          Pertanyaan reflektif yang disusun bersama psikolog untuk memahami
-          kecenderungan kepribadian melalui kerangka 30 Juz Al-Qur’an
+          Pertanyaan reflektif yang disusun bersama psikolog untuk memahami kecenderungan kepribadian melalui kerangka 30 Juz Al-Qur’an
         </p>
 
         <div className="font-plus-jakarta mt-8 flex flex-col flex-row justify-center gap-6 font-semibold">
-          <button className="bg-[var(--color-primary-button)] text-white px-4 py-2 rounded-lg shadow-lg hover:bg-[var(--color-primary-700)] cursor-pointer"
-          onClick={handleTestClick}>
-            Mulai Test <ArrowRight className="inline-block ml-2" />
+          <button className="bg-[var(--color-primary-button)] text-white px-4 py-2 rounded-lg shadow-lg hover:bg-[var(--color-primary-700)] cursor-pointer inline-flex items-center justify-center"
+          onClick={() => router.push("/register")}>
+            Mulai Test <FaArrowRight className="ml-2" />
           </button>
-          <button className="border border-[var(--foreground)] px-4 py-2 rounded-lg shadow-lg hover:bg-[var(--color-primary-300)] cursor-pointer text-[var(--foreground)]">
+          <button className="border border-[var(--foreground)] px-4 py-2 rounded-lg shadow-lg hover:bg-[var(--color-primary-300)] cursor-pointer text-[var(--foreground)]"
+          onClick={() => window.open("https://www.htqfoundation.com/", "_blank", "noopener,noreferrer")}>
             Tentang HTQ
           </button>
         </div>

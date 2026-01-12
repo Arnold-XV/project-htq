@@ -81,3 +81,40 @@ body {
   font-family: var(--font-cormorant), serif;
 }
 
+.autoshow{
+  animation: text-appear both;
+  animation-timeline: view();
+  animation-range: entry 20% cover 100vh;
+}
+
+@keyframes text-appear {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fadeup{
+  animation: fadeup both;
+  animation-timeline: view();
+  animation-range: entry 50% cover 40%;
+}
+
+@keyframes fadeup{
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}

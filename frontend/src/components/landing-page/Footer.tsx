@@ -1,10 +1,10 @@
 import Image from "next/image";
-import { Facebook, Instagram, Phone } from "react-feather";
+import { FaFacebookSquare, FaPhoneAlt, FaInstagram } from "react-icons/fa";
 
 export default function Footer() {
   return (
     <footer className="border border-[var(--color-neutral-200)] py-12 bg-[var(--color-background)] text-[var(--foreground)]">
-      <div className="container mx-auto px-4 md:px-6">
+      <div className="container mx-auto px-7 md:px-20">
         <div className="flex flex-col md:flex-row justify-between gap-10 mb-8">
           {/* LEFT */}
           <div className="md:w-1/3">
@@ -20,14 +20,14 @@ export default function Footer() {
                 <p>Tadarus Al-Qur&apos;an</p>
               </div>
             </div>
-            <p className="text-lg font-plus-jakarta text-base mt-4 text-[var(--foreground)]">
+            <p className="text-md md:text-lg font-plus-jakarta mt-4 text-[var(--foreground)]">
               Foresta Business Loft II Unit 6, RW 7, Lengkong Kulon, Kec. Pagedangan, 
               Kabupaten Tangerang, Banten 15331
             </p>
           </div>
 
           {/* RIGHT */}
-          <div className="md:w-2/3 flex justify-end gap-10 font-plus-jakarta text-lg">
+          <div className="md:w-2/3 flex justify-end gap-10 font-plus-jakarta text-md">
             <div>
               <h4 className="font-bold mb-4">Page</h4>
               <ul className="space-y-2">
@@ -56,26 +56,26 @@ export default function Footer() {
         {/* BOTTOM */}
         <div className="flex flex-col md:flex-row items-center justify-between pt-8 font-plus-jakarta text-[var(--foreground)]">
           <p className="text-base">
-            <span className="text-base font-light align-middle relative -top-0.5 mr-1.5">©</span> 2025 Copyright - HTQ Foundation
+            <span className="text-base font-light align-middle relative -top-0.5 mr-1.5">©</span> 2025 Copyright - OmahTI
           </p>
-          <div className="flex items-center gap-2 mt-2 md:mt-0">
+          <div className="flex items-center gap-5 mt-2 md:mt-0">
             <a
               href="#"
-              className="w-8 h-8 rounded-full bg-[var(--color-neutral-200)] flex items-center justify-center hover:bg-[var(--color-primary-button)] transition-colors"
+              className="flex items-center justify-center"
             >
-              <Phone className="w-4 h-4 text-[var(--foreground)] hover:text-[var(--background)]" />
+              <FaPhoneAlt className="w-4 h-4 text-[var(--foreground)]" />
             </a>
             <a
               href="#"
-              className="w-8 h-8 rounded-full bg-[var(--color-neutral-200)] flex items-center justify-center hover:bg-[var(--color-primary-button)] transition-colors"
+              className="flex items-center justify-center"
             >
-              <Instagram className="w-4 h-4 text-[var(--foreground)] hover:text-[var(--background)]" />
+              <FaInstagram className="w-4 h-4 text-[var(--foreground)]" />
             </a>
             <a
               href="#"
-              className="w-8 h-8 rounded-full bg-[var(--color-neutral-200)] flex items-center justify-center hover:bg-[var(--color-primary-button)] transition-colors"
+              className="flex items-center justify-center"
             >
-              <Facebook className="w-4 h-4 text-[var(--foreground)] hover:text-[var(--background)]" />
+              <FaFacebookSquare className="w-4 h-4 text-[var(--foreground)]" />
             </a>
           </div>
         </div>

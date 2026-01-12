@@ -23,12 +23,12 @@ const Hasil = () => {
   return (
     <section className="py-5 px-3 md:py-24 bg-white text-black">
       <div className="container mx-auto px-4 md:px-6">
-        <h2 className="text-3xl lg:text-4xl text-center mb-10" style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 800 }}>
+        <h2 className="text-3xl lg:text-4xl text-center mb-10 autoshow" style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 800 }}>
         Hasil yang Kamu Dapatkan
         </h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 max-w-[80rem] mx-auto items-center">
-          <div className="flex justify-center lg:justify-end lg:order-2">
+          <div className="flex justify-center lg:justify-end lg:order-2 fadeup">
             <Image
               src="/hasil-4.png"
               alt="Hasil Card Preview"
@@ -37,7 +37,7 @@ const Hasil = () => {
               className="mb-10 lg:mb-0" //"rounded-2xl shadow-lg border border-gray-200"
             />
           </div>
-          <div className="space-y-5 max-w-[45rem] lg:order-1">
+          <div className="space-y-5 max-w-[45rem] lg:order-1 fadeup">
             {hasil.map((item, index) => (
               <div key={index} className="flex gap-5 md:gap-8 items-end">
                 <Image 
