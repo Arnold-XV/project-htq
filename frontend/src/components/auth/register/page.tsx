@@ -1,12 +1,11 @@
 'use client';
 
-import React from 'react';
-import Login from './Register';
+import Register from './Register';
 
 const RegisterPage = () => {
   return (
     <div className="relative overflow-x-hidden">
-      <Login />
+      <Register />
     </div>
   );
 };

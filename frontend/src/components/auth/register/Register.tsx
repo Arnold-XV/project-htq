@@ -4,12 +4,40 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Calendar, ChevronLeft, Mail, Upload, User } from "react-feather";
+import { useForm, Controller } from "react-hook-form";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
+type FormData = {
+  name: string;
+  email: string;
+  birthdate: Date | null;
+  photo: FileList;
+};
 
 export default function Register() {
   const router = useRouter();
   const [agree, setAgree] = useState(false);
   const [photo, setPhoto] = useState<File | null>(null);
   const [showPrivacy, setShowPrivacy] = useState(false);
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+    setError,
+  } = useForm<FormData>();
+
+  const onSubmit = () => {
+    if (!agree) {
+      setError("root", { 
+        type: "manual", 
+        message: "Kamu harus menyetujui Kebijakan Privasi" });
+      return;
+    }
+    router.push("/test-page");
+  };
 
   return (
     <section className="h-screen bg-[var(--color-neutral-50)] items-center justify-center px-4 py-12 text-[var(--foreground)] relative flex flex-col">
@@ -28,51 +56,99 @@ export default function Register() {
             height={60}
             className="mx-auto mb-2"
           />
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-[var(--color-tosca)] to-[var(--color-success-900)] bg-clip-text text-transparent">
-            Buat Akun untuk Memulai
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--color-tosca)] to-[var(--color-success-900)] bg-clip-text text-transparent">
+            Langkah awal untuk melanjutkan
           </h1>
           <p className="text-sm text-[var(--foreground)] font-medium mt-1">
             Kami hanya butuh sedikit info sebelum kamu mulai.
           </p>
         </div>
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-md border border-[var(--color-neutral-200)] p-6 md:p-8">
+      <div className="w-full max-w-md bg-white rounded-lg shadow-md border border-[var(--color-neutral-200)] p-6 md:p-8">
 
         {/* Form */}
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          {/* Nama */}
           <div className="relative">
             <label className="text-sm font-bold">Nama</label>
             <input
               type="text"
+              id="nama"
               placeholder="fatimah@badr.co.id"
+              {...register("name", { required: "Nama wajib diisi" })}
               className="mt-1 w-full rounded-md border border-[var(--color-neutral-300)] px-9 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-300)]"
             />
             <User className="absolute left-3 top-10 h-4 w-4 text-[var(--color-neutral-600)]"></User>
+              {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
           </div>
 
+          {/* Email */}
           <div className="relative">
             <label className="text-sm font-bold">Alamat Email</label>
             <input
               type="email"
+              id="email"
               placeholder="fatimah@badr.co.id"
+              {...register("email", { required: "Email wajib diisi",
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Format email tidak valid"
+                },
+               })}
               className="mt-1 w-full rounded-lg border border-[var(--color-neutral-300)] px-9 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-500)]"
             />
             <Mail className="absolute left-3 top-10 h-4 w-4 text-[var(--color-neutral-600)]"></Mail>
+              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
           </div>
 
+          {/* Tanggal Lahir */}
           <div className="relative">
             <label className="text-sm font-bold">Tanggal Lahir</label>
-            <input
-              type="date"
-              className="mt-1 w-full rounded-lg border border-[var(--color-neutral-300)] pl-9 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-300)] text-[var(--color-neutral-500)]"
+
+            <Controller
+              control={control}
+              name="birthdate"
+              rules={{ required: "Tanggal lahir wajib diisi" }}
+              render={({ field }) => (
+                <div className="w-full">
+                  <DatePicker
+                  placeholderText="MM/DD/YYYY"
+                  selected={field.value}
+                  onChange={field.onChange}
+                  showMonthDropdown
+                  showYearDropdown
+                  dropdownMode="select"
+                  dateFormat="MM/dd/yyyy"
+                  wrapperClassName="w-full"
+                  className="mt-1 w-full rounded-lg border border-[var(--color-neutral-300)] pl-9 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-300)] text-[var(--color-neutral-500)]"
+                /> </div>
+              )}
             />
-            <Calendar className="absolute left-3 top-10 h-4 w-4 text-[var(--color-neutral-600)] "></Calendar>
+
+            <Calendar className="absolute left-3 top-10 h-4 w-4 text-[var(--color-neutral-600)]" />
+
+            {errors.birthdate && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.birthdate.message}
+              </p>
+            )}
           </div>
 
+          {/* Upload Foto */}
           <div className="relative">
             <label className="text-sm font-bold">Foto</label>
             <label
               htmlFor="photo"
-              className="mt-1 flex items-center gap-2 border border-dashed border-[var(--color-neutral-300)] rounded-lg pl-9 py-2 px-3 text-sm text-[var(--color-neutral-500)] cursor-pointer hover:bg-[var(--color-neutral-100)]"
+              className="mt-1 flex items-center gap-2 rounded-lg pl-9 py-2 px-3 text-sm
+                text-[var(--color-neutral-500)] cursor-pointer hover:bg-[var(--color-neutral-100)]
+                relative
+              "
+              style={{
+                background:
+                  "repeating-linear-gradient(90deg, var(--color-neutral-400) 0 8px, transparent 8px 13px) top / calc(100% + 13px) 1px no-repeat," +
+                  "repeating-linear-gradient(90deg, var(--color-neutral-400) 0 8px, transparent 8px 13px) bottom / calc(100% + 13px) 1px no-repeat," +
+                  "repeating-linear-gradient(0deg, var(--color-neutral-400) 0 8px, transparent 8px 13px) left / 1px calc(100% + 25px) no-repeat," +
+                  "repeating-linear-gradient(0deg, var(--color-neutral-400) 0 8px, transparent 8px 13px) right / 1px calc(100% + 25px) no-repeat",
+              }}
             >
               <Upload className="h-4 w-4 absolute left-3 text-[var(--color-neutral-600)]" />
               {photo ? photo.name : "Upload file"}
@@ -81,12 +157,16 @@ export default function Register() {
               id="photo"
               type="file"
               accept="image/*"
+              {...register("photo", { required: "Foto wajib diupload" })}
               className="hidden"
               onChange={(e) => {if (e.target.files && e.target.files[0]) setPhoto(e.target.files[0])}}
             />
-            <p className="text-sm font-medium text-[var(--color-neutral-400)] mt-1">This is a hint text to help user.</p>
+            <p className="text-xs font-medium text-[var(--color-neutral-400)] mt-1">
+              Foto hanya digunakan sebagai bagian dari proses refleksi diri dan tidak dipublikasikan atau dibagikan ke pihak mana pun.</p>
+            {errors.photo && <p className="text-red-500 text-xs mt-1">{errors.photo.message}</p>}
           </div>
 
+         {/* Syarat & Ketentuan */}
          <div className="flex items-start gap-3 text-xs text-[var(--foreground)]">
             <input
               type="checkbox"
@@ -113,6 +193,8 @@ export default function Register() {
               </button>
             </p>
           </div>
+
+          {errors.root && <p className="text-red-500 text-xs mt-1">{errors.root.message}</p>}
 
           {showPrivacy && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -141,23 +223,14 @@ export default function Register() {
           )}
 
           <button
-            type="button"
+            type="submit"
             disabled={!agree}
-            onClick={() => router.push("/auth/login")}
             className="w-full mt-2 rounded-lg bg-gradient-to-t from-[var(--color-tosca)] to-[var(--color-success-900)] text-white py-2 text-sm font-medium disabled:opacity-50 cursor-pointer hover:bg-[var(--color-primary-700)] transition-colors"
           >
-            Register
+            Mulai Tes
           </button>
         </form>
 
-        <p className="text-center text-xs text-[var(--foreground)] mt-5">
-          Sudah mempunyai akun? {" "}
-          <button
-            type="button"
-            onClick={() => router.push("/auth/login")}
-            className="font-bold hover:underline cursor-pointer"
-          >Login</button>
-        </p>
       </div>
     </section>
   );
