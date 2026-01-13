@@ -22,12 +22,14 @@ export default function HasilJuz() {
           </p>
         </div>
       </div>
-      <div className="flex flex-row items-center justify-center">
-        <div className="w-1/2">
-          <p className="font-bold text-[22px]">Karakteristik Utama</p>
+      <div className="flex flex-row items-stretch justify-center gap-[25px]">
+        <div className="rounded-[10px] shadow-sm bg-neutral-50 px-5.5 pt-7 pb-13 flex-1">
+          <p className="font-bold text-[22px] border-b border-neutral-200 w-full">
+            Karakteristik Utama
+          </p>
           <div></div>
         </div>
-        <div className="rounded-[10px] shadow-sm bg-neutral-50 px-5.5 pt-7 pb-13">
+        <div className="rounded-[10px] shadow-sm bg-neutral-50 px-5.5 pt-7 pb-13 flex-1">
           <p className="font-bold text-[22px] pb-[9px] border-b  border-neutral-200 w-full">
             Arah Pengembangan Diri
           </p>
