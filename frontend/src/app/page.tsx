@@ -1,7 +1,10 @@
-import RegisterPage from "@/components/auth/register/Register";
+import Landing from "@/components/landing-page/page";
+
 
 export default function Home() {
   return (
-    <RegisterPage />
+    <main className="min-h-screen">
+      <Landing />
+    </main>
   );
 }
