@@ -6,9 +6,9 @@ import KonsultasiCard from "@/components/result-page/konsultasi-card";
 
 export default function Result() {
   return (
-    <div className="mx-21">
+    <div className="lg:mx-21 md:mx-10 mx-5">
       <HasilJuz />
-      <div className="flex flex-row justify-end gap-5 my-8">
+      <div className="flex flex-row md:justify-end justify-center gap-5 my-8">
         <RestartTest />
         <ShareButton />
       </div>

@@ -57,7 +57,7 @@
   --color-error-900: #7a271a;
 
   --color-tosca: #3d9f8e;
-  --color-primary-button: #003B33;
+  --color-primary-button: #003b33;
   --color-neutral-200-400: #ffbd59;
   --color-background-1: #8db39e;
   --color-background-2: #beded0;
@@ -100,6 +100,9 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+
+  --breakpoint-xxs: 330px;
+  --breakpoint-xs: 380px;
 }
 
 body {
@@ -110,7 +113,7 @@ body {
   font-family: var(--font-cormorant), serif;
 }
 
-.autoshow{
+.autoshow {
   animation: text-appear both;
   animation-timeline: view();
   animation-range: entry 20% cover 100vh;
@@ -127,13 +130,13 @@ body {
   }
 }
 
-.fadeup{
+.fadeup {
   animation: fadeup both;
   animation-timeline: view();
   animation-range: entry 50% cover 40%;
 }
 
-@keyframes fadeup{
+@keyframes fadeup {
   from {
     opacity: 0;
     transform: translateY(20px) scale(0.5);
