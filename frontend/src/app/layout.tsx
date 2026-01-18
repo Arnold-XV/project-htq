@@ -19,6 +19,9 @@ const cormorant = Cormorant_Garamond({
 export const metadata: Metadata = {
   title: "HTQ Personality Test",
   description: "",
+  icons: {
+    icon: "/htq-logo.png",
+  },
 };
 
 export default function RootLayout({
