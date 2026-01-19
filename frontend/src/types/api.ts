@@ -70,15 +70,18 @@ export interface GetQuestionsResponse {
 
 export interface SubmitQuizRequest {
   answers: Record<string, string>; // { questionId: optionId }
+  anonUserId?: string; // Optional for anonymous users
 }
 
 export interface SubmitQuizResponse {
   result: {
     id: string;
     personality_type: string;
-    juz_number: number;
+    juz_result: number;
+    title: string;
     scores: Record<string, number>;
-    personality: {
+    is_anonymous?: boolean;
+    personality?: {
       name: string;
       description: string;
       traits: string[];
@@ -226,4 +229,31 @@ export interface AuthSession {
   expires_at?: number;
   token_type: string;
   user: AuthUser;
+}
+
+// ============================================
+// ANONYMOUS USER TYPES
+// ============================================
+
+export interface MergeAnonymousRequest {
+  anonUserId: string;
+}
+
+export interface MergeAnonymousResponse {
+  message: string;
+  mergedCount: number;
+}
+
+export interface GetAnonymousResultsResponse {
+  results: Array<{
+    id: string;
+    personality_type: string;
+    juz_result: number;
+    title: string;
+    description: string;
+    strengths: string[];
+    challenges: string[];
+    advice: string;
+    completed_at: string;
+  }>;
 }

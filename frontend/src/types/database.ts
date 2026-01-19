@@ -123,30 +123,45 @@ export interface Database {
       quiz_results: {
         Row: {
           id: string;
-          user_id: string;
+          user_id: string | null;
+          anon_user_id: string | null;
+          is_anonymous: boolean;
           personality_type: string;
-          juz_number: number;
-          scores: Record<string, number>;
+          juz_result: number;
+          title: string;
+          description: string;
+          strengths: string[];
+          challenges: string[];
+          advice: string;
           completed_at: string;
-          created_at: string;
         };
         Insert: {
           id?: string;
-          user_id: string;
+          user_id?: string | null;
+          anon_user_id?: string | null;
+          is_anonymous?: boolean;
           personality_type: string;
-          juz_number: number;
-          scores: Record<string, number>;
+          juz_result: number;
+          title: string;
+          description: string;
+          strengths?: string[];
+          challenges?: string[];
+          advice?: string;
           completed_at?: string;
-          created_at?: string;
         };
         Update: {
           id?: string;
-          user_id?: string;
+          user_id?: string | null;
+          anon_user_id?: string | null;
+          is_anonymous?: boolean;
           personality_type?: string;
-          juz_number?: number;
-          scores?: Record<string, number>;
+          juz_result?: number;
+          title?: string;
+          description?: string;
+          strengths?: string[];
+          challenges?: string[];
+          advice?: string;
           completed_at?: string;
-          created_at?: string;
         };
       };
       quiz_answers: {
