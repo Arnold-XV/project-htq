@@ -1,15 +1,28 @@
 {
-  "name": "frontend",
-  "version": "0.1.0",
+  "name": "htq-personality-quiz",
+  "version": "1.0.0",
   "private": true,
+  "description": "HTQ Personality Quiz - Al-Quran based MBTI-like personality assessment",
+  "author": "HTQ Foundation",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "type-check": "tsc --noEmit",
+    "docker:dev": "docker-compose -f docker-compose.dev.yml up",
+    "docker:prod": "docker-compose up",
+    "docker:build": "docker-compose build",
+    "docker:down": "docker-compose down",
+    "docker:clean": "docker-compose down -v --rmi all",
+    "docker:logs": "docker-compose logs -f",
+    "test:api": "curl http://localhost:3000/api/health",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\""
   },
   "dependencies": {
-    "@supabase/ssr": "^0.3.0",
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.90.1",
     "next": "16.1.1",
     "react": "19.2.3",
     "react-datepicker": "^9.1.0",

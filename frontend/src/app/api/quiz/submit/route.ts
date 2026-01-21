@@ -1,11 +1,11 @@
-// API Route: Submit Quiz Answers
+// API Route: Submit Quiz Answers (Supports Anonymous Users)
 import { createClient } from '@/lib/supabase/server';
 import { calculatePersonalityType } from '@/lib/utils';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    const { answers } = await request.json();
+    const { answers, anonUserId } = await request.json();
 
     // Validation
     if (!answers || typeof answers !== 'object') {
@@ -22,9 +22,12 @@ export async function POST(request: Request) {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) {
+    // Determine if this is an anonymous submission
+    const isAnonymous = !user && anonUserId;
+
+    if (!user && !anonUserId) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Either authentication or anonymous user ID is required' },
         { status: 401 }
       );
     }
@@ -43,21 +46,30 @@ export async function POST(request: Request) {
       console.error('Personality type fetch error:', personalityError);
     }
 
-    // Create quiz result
+    // Create quiz result with anonymous support
+    const resultData: any = {
+      personality_type: type,
+      juz_result: personalityData?.juz_number || juz,
+      title: personalityData?.name || type,
+      description: personalityData?.description || '',
+      strengths: personalityData?.strengths || [],
+      challenges: personalityData?.challenges || [],
+      advice: personalityData?.development_advice || '',
+    };
+
+    if (isAnonymous) {
+      resultData.anon_user_id = anonUserId;
+      resultData.is_anonymous = true;
+      resultData.user_id = null;
+    } else {
+      resultData.user_id = user!.id;
+      resultData.is_anonymous = false;
+      resultData.anon_user_id = null;
+    }
+
     const { data: result, error: resultError } = await supabase
       .from('quiz_results')
-      .insert([
-        {
-          user_id: user.id,
-          personality_type: type,
-          juz_result: personalityData?.juz_number || juz,
-          title: personalityData?.name || type,
-          description: personalityData?.description || '',
-          strengths: personalityData?.strengths || [],
-          challenges: personalityData?.challenges || [],
-          advice: personalityData?.development_advice || '',
-        },
-      ])
+      .insert([resultData])
       .select()
       .single();
 
@@ -94,6 +106,7 @@ export async function POST(request: Request) {
           juz_result: result.juz_result,
           title: result.title,
           scores,
+          is_anonymous: isAnonymous,
         },
       },
       { status: 201 }
