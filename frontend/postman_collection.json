@@ -1,0 +1,206 @@
+{
+  "info": {
+    "name": "HTQ Backend API V2",
+    "_postman_id": "htq-backend-v2-collection",
+    "description": "Postman collection for HTQ Personality Quiz backend with new 4-layer quiz system (Extraversion, Ego+Neuro, Branch, Tie-breaker)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "2.0.0"
+  },
+  "item": [
+    {
+      "name": "Auth - Register",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"P@ssw0rd!\",\n  \"name\": \"Nama Pengguna\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api","auth","register"] }
+      },
+      "response": []
+    },
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"P@ssw0rd!\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] }
+      }
+    },
+    {
+      "name": "Auth - Logout",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{bearerToken}}" } ],
+        "url": { "raw": "{{baseUrl}}/api/auth/logout", "host": ["{{baseUrl}}"], "path": ["api","auth","logout"] }
+      }
+    },
+    {
+      "name": "User - Get Profile",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Authorization", "value": "Bearer {{bearerToken}}" } ],
+        "url": { "raw": "{{baseUrl}}/api/user/profile", "host": ["{{baseUrl}}"], "path": ["api","user","profile"] }
+      }
+    },
+    {
+      "name": "User - Update Profile",
+      "request": {
+        "method": "PATCH",
+        "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{bearerToken}}" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"name\": \"Nama Baru\",\n  \"bio\": \"Bio singkat\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/user/profile", "host": ["{{baseUrl}}"], "path": ["api","user","profile"] }
+      }
+    },
+    {
+      "name": "User - Upload Photo (example)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Authorization", "value": "Bearer {{bearerToken}}" } ],
+        "body": { "mode": "formdata", "formdata": [ { "key": "file", "type": "file" } ] },
+        "url": { "raw": "{{baseUrl}}/api/user/upload-photo", "host": ["{{baseUrl}}"], "path": ["api","user","upload-photo"] }
+      }
+    },
+    {
+      "name": "Quiz - Layer 1: Get Extraversion Questions",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { 
+          "raw": "{{baseUrl}}/api/quiz/questions?layer=1", 
+          "host": ["{{baseUrl}}"], 
+          "path": ["api","quiz","questions"], 
+          "query": [ { "key": "layer", "value": "1", "description": "Layer 1: Extraversion (11 questions)" } ] 
+        }
+      }
+    },
+    {
+      "name": "Quiz - Layer 2: Get Ego+Neuro Questions",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { 
+          "raw": "{{baseUrl}}/api/quiz/questions?layer=2", 
+          "host": ["{{baseUrl}}"], 
+          "path": ["api","quiz","questions"], 
+          "query": [ { "key": "layer", "value": "2", "description": "Layer 2: Ego (5Q) + Neuroticism (5Q)" } ] 
+        }
+      }
+    },
+    {
+      "name": "Quiz - Layer 3: Get Branch Questions (EHNH)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { 
+          "raw": "{{baseUrl}}/api/quiz/questions?layer=3&branch=EHNH", 
+          "host": ["{{baseUrl}}"], 
+          "path": ["api","quiz","questions"], 
+          "query": [ 
+            { "key": "layer", "value": "3", "description": "Layer 3: Branch questions" },
+            { "key": "branch", "value": "EHNH", "description": "Branch code (EHNH/EHNL/ELNH/ELNL)" }
+          ] 
+        }
+      }
+    },
+    {
+      "name": "Quiz - Get Tie-Breaker Question",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { 
+          "raw": "{{baseUrl}}/api/quiz/tie-breaker?juzA=12&juzB=14", 
+          "host": ["{{baseUrl}}"], 
+          "path": ["api","quiz","tie-breaker"], 
+          "query": [ 
+            { "key": "juzA", "value": "12", "description": "First Juz number" },
+            { "key": "juzB", "value": "14", "description": "Second Juz number" }
+          ] 
+        }
+      }
+    },
+    {
+      "name": "Quiz - Submit Layer 1 (anonymous)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { 
+          "mode": "raw", 
+          "raw": "{\n  \"layer\": 1,\n  \"answers\": [\n    {\"question_id\": 1, \"option_id\": 1},\n    {\"question_id\": 2, \"option_id\": 3}\n  ],\n  \"anonUserId\": \"{{anonUserId}}\"\n}" 
+        },
+        "url": { "raw": "{{baseUrl}}/api/quiz/submit", "host": ["{{baseUrl}}"], "path": ["api","quiz","submit"] }
+      }
+    },
+    {
+      "name": "Quiz - Submit Layer 2 (determines branch)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { 
+          "mode": "raw", 
+          "raw": "{\n  \"layer\": 2,\n  \"answers\": [\n    {\"question_id\": 12, \"option_id\": 23},\n    {\"question_id\": 13, \"option_id\": 25}\n  ],\n  \"resultId\": \"{{resultId}}\",\n  \"anonUserId\": \"{{anonUserId}}\"\n}" 
+        },
+        "url": { "raw": "{{baseUrl}}/api/quiz/submit", "host": ["{{baseUrl}}"], "path": ["api","quiz","submit"] }
+      }
+    },
+    {
+      "name": "Quiz - Submit Layer 3 (Juz scoring)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { 
+          "mode": "raw", 
+          "raw": "{\n  \"layer\": 3,\n  \"answers\": [\n    {\"question_id\": 22, \"option_id\": 43},\n    {\"question_id\": 23, \"option_id\": 45}\n  ],\n  \"resultId\": \"{{resultId}}\",\n  \"anonUserId\": \"{{anonUserId}}\"\n}" 
+        },
+        "url": { "raw": "{{baseUrl}}/api/quiz/submit", "host": ["{{baseUrl}}"], "path": ["api","quiz","submit"] }
+      }
+    },
+    {
+      "name": "Quiz - Submit Layer 4 (tie-breaker)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { 
+          "mode": "raw", 
+          "raw": "{\n  \"layer\": 4,\n  \"answers\": [],\n  \"resultId\": \"{{resultId}}\",\n  \"anonUserId\": \"{{anonUserId}}\",\n  \"tiebreakerAnswer\": \"A\"\n}" 
+        },
+        "url": { "raw": "{{baseUrl}}/api/quiz/submit", "host": ["{{baseUrl}}"], "path": ["api","quiz","submit"] }
+      }
+    },
+    {
+      "name": "Quiz - Get Results (by result id)",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Authorization", "value": "Bearer {{bearerToken}}" } ],
+        "url": { "raw": "{{baseUrl}}/api/quiz/results?resultId={{resultId}}", "host": ["{{baseUrl}}"], "path": ["api","quiz","results"], "query": [ { "key": "resultId", "value": "{{resultId}}" } ] }
+      }
+    },
+    {
+      "name": "Quiz - Get Anonymous Results",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/api/quiz/results/anonymous?anonUserId={{anonUserId}}", "host": ["{{baseUrl}}"], "path": ["api","quiz","results","anonymous"], "query": [ { "key": "anonUserId", "value": "{{anonUserId}}" } ] }
+      }
+    },
+    {
+      "name": "User - Merge Anonymous",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{bearerToken}}" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"anonUserId\": \"{{anonUserId}}\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/user/merge-anonymous", "host": ["{{baseUrl}}"], "path": ["api","user","merge-anonymous"] }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "bearerToken", "value": "" },
+    { "key": "anonUserId", "value": "anon_XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" },
+    { "key": "resultId", "value": "" }
+  ]
+}
