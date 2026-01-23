@@ -7,6 +7,7 @@ import { Calendar, ChevronLeft, Mail, Upload, User } from "react-feather";
 import { useForm, Controller } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { API_BASE_URL } from "@/lib/constants";
 
 type FormData = {
   name: string;
@@ -20,6 +21,7 @@ export default function Register() {
   const [agree, setAgree] = useState(false);
   const [photo, setPhoto] = useState<File | null>(null);
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const {
     register,
@@ -29,15 +31,67 @@ export default function Register() {
     setError,
   } = useForm<FormData>();
 
-  const onSubmit = () => {
-    if (!agree) {
-      setError("root", { 
-        type: "manual", 
-        message: "Kamu harus menyetujui Kebijakan Privasi" });
-      return;
+const onSubmit = async (data: FormData) => {
+  if (!agree) {
+    setError("root", { message: "Kamu harus menyetujui Kebijakan Privasi" });
+    return;
+  }
+
+  if (!data.photo?.length) {
+    setError("photo", { message: "Foto wajib diupload" });
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    // ONBOARDING
+    const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: data.name,
+        email: data.email,
+        birthdate: data.birthdate,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Gagal memulai tes");
     }
+
+    const result = await res.json();
+    const token = result.session?.access_token;
+
+    if (!token) {
+      throw new Error("Session tidak ditemukan");
+    }
+
+    // UPLOAD FOTO
+    const fd = new FormData();
+    fd.append("file", data.photo[0]);
+
+    const uploadRes = await fetch(`${API_BASE_URL}/api/user/upload-photo`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: fd,
+    });
+
+    if (!uploadRes.ok) {
+      throw new Error("Upload foto gagal");
+    }
+
+    // MULAI TEST
     router.push("/test-page");
-  };
+  } catch (err) {
+    console.error(err);
+    setError("root", { message: "Terjadi kesalahan, coba lagi" });
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <section className="h-screen bg-[var(--color-neutral-50)] items-center justify-center px-4 py-12 text-[var(--foreground)] relative flex flex-col">
@@ -73,7 +127,7 @@ export default function Register() {
             <input
               type="text"
               id="nama"
-              placeholder="fatimah@badr.co.id"
+              placeholder="fatimah"
               {...register("name", { required: "Nama wajib diisi" })}
               className="mt-1 w-full rounded-md border border-[var(--color-neutral-300)] px-9 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-300)]"
             />
@@ -157,9 +211,14 @@ export default function Register() {
               id="photo"
               type="file"
               accept="image/*"
-              {...register("photo", { required: "Foto wajib diupload" })}
+              {...register("photo", { required: "Foto wajib diupload",
+              onChange: (e) => {const file = e.target.files?.[0];
+                if (file) {
+                  setPhoto(file);
+                }
+              },
+             })}
               className="hidden"
-              onChange={(e) => {if (e.target.files && e.target.files[0]) setPhoto(e.target.files[0])}}
             />
             <p className="text-xs font-medium text-[var(--color-neutral-400)] mt-1">
               Foto hanya digunakan sebagai bagian dari proses refleksi diri dan tidak dipublikasikan atau dibagikan ke pihak mana pun.</p>
@@ -227,7 +286,7 @@ export default function Register() {
             disabled={!agree}
             className="w-full mt-2 rounded-lg bg-gradient-to-t from-[var(--color-tosca)] to-[var(--color-success-900)] text-white py-2 text-sm font-medium disabled:opacity-50 cursor-pointer hover:bg-[var(--color-primary-700)] transition-colors"
           >
-            Mulai Tes
+            {loading ? "Loading..." : "Mulai Tes"}
           </button>
         </form>
 
