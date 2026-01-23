@@ -18,6 +18,29 @@ const QuestionsContext = createContext<{
 }>({ answers: {}, setAnswers: () => {}, clear: () => {} });
 
 const STORAGE_KEY = "htq-answers";
+const ANON_KEY = "anonUserId";
+
+function ensureAnonUserId(): string {
+  try {
+    let id = localStorage.getItem(ANON_KEY);
+    if (!id) {
+      id = `anon_${Date.now().toString(36)}_${Math.random()
+        .toString(36)
+        .slice(2, 8)}`;
+      try {
+        localStorage.setItem(ANON_KEY, id);
+      } catch {}
+      try {
+        document.cookie = `${ANON_KEY}=${id}; path=/;`;
+      } catch {}
+    }
+    return id;
+  } catch {
+    return `anon_${Date.now().toString(36)}_${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
+  }
+}
 
 export const QuestionsProvider = ({
   children,
@@ -34,6 +57,10 @@ export const QuestionsProvider = ({
 
     requestAnimationFrame(() => {
       try {
+        try {
+          ensureAnonUserId();
+        } catch {}
+
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);

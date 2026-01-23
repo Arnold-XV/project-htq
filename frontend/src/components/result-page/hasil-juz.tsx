@@ -1,6 +1,39 @@
 import React from "react";
 
-export default function HasilJuz() {
+export default function HasilJuz({ result }: { result?: any }) {
+  if (!result) {
+    return null;
+  }
+
+  const title = result.title ?? result.personality_type ?? "Hasil";
+  const juz = result.juz_result ?? result.juz ?? "-";
+  const description = result.description ?? "Deskripsi tidak tersedia.";
+
+  const rawScores = result.scores ?? {};
+  let scoresArr: { label: string; percent: number }[] = [];
+
+  if (Array.isArray(rawScores)) {
+    scoresArr = rawScores.map((s: any) =>
+      typeof s === "number"
+        ? { label: "Score", percent: s }
+        : { label: s.label ?? "Score", percent: s.percent ?? 0 },
+    );
+  } else if (rawScores && typeof rawScores === "object") {
+    scoresArr = Object.entries(rawScores).map(([k, v]) => ({
+      label: k,
+      percent: Number(v) || 0,
+    }));
+  } else {
+    const fallbackLabels = [
+      "Karakteristik A",
+      "Karakteristik B",
+      "Karakteristik C",
+    ];
+    scoresArr = fallbackLabels.map((l, i) => ({
+      label: l,
+      percent: Math.min(80, 40 + i * 10),
+    }));
+  }
   return (
     <div className="flex flex-col gap-7 mt-4.5">
       <div className="shadow-sm">
@@ -10,20 +43,13 @@ export default function HasilJuz() {
           style={{ backgroundImage: "url(/image/juz-result-bg.webp)" }}
         >
           <h4 className="font-bold lg:text-[38px] text-[26px] z-1">
-            Juz 29 - Pemikir Empatik
+            Juz {juz} - {title}
           </h4>
-          <p className="lg:text-[22px] text-[16px] z-1">
-            Pemikir, Penuh Empati & Reflektif
-          </p>
+          <p className="lg:text-[22px] text-[16px] z-1">{description}</p>
         </div>
         <div className="pl-10.75 pr-8.5 pt-9.25 pb-13">
           <p className="text-center lg:text-[18px] text-[14px]">
-            Kamu sering merasakan lebih banyak daripada yang kamu ungkapkan.
-            Saat orang lain melihatmu tenang, di dalam dirimu ada proses
-            berpikir dan merasakan yang panjang. Kepekaan emosimu adalah
-            kekuatan, namun tanpa disadari, kamu juga bisa kelelahan karena
-            terlalu sering menempatkan kebutuhan orang lain di atas dirimu
-            sendiri.
+            {description}
           </p>
         </div>
       </div>
@@ -33,49 +59,22 @@ export default function HasilJuz() {
             Karakteristik Utama
           </p>
           <div className="w-full flex flex-col gap-2 mt-2">
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-row justify-between items-center">
-                <p className="lg:text-[18px] text-[14px]">Neo</p>
-                <p className="bg-[#E6F6F4] px-2.5 py-[5px] text-[#007F6D] font-semibold rounded-[5px] lg:text-[16px] text-[12px]">
-                  67%
-                </p>
+            {scoresArr.map((s, i) => (
+              <div key={i} className="flex flex-col gap-2">
+                <div className="flex flex-row justify-between items-center">
+                  <p className="lg:text-[18px] text-[14px]">{s.label}</p>
+                  <p className="bg-[#E6F6F4] px-2.5 py-[5px] text-[#007F6D] font-semibold rounded-[5px] lg:text-[16px] text-[12px]">
+                    {s.percent}%
+                  </p>
+                </div>
+                <div className="bg-neutral-200 rounded-[20px]">
+                  <div
+                    style={{ width: `${s.percent}%` }}
+                    className="rounded-[20px] bg-gradient-to-r from-[#3D9F8E] to-[#177766] h-3"
+                  />
+                </div>
               </div>
-              <div className="bg-neutral-200 rounded-[20px]">
-                <div
-                  style={{ width: `67%` }}
-                  className="rounded-[20px] bg-gradient-to-r from-[#3D9F8E] to-[#177766] h-3"
-                ></div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-row justify-between items-center">
-                <p className="lg:text-[18px] text-[14px]">Ego</p>
-                <p className="bg-[#E6F6F4] px-2.5 py-[5px] text-[#007F6D] font-semibold rounded-[5px] lg:text-[16px] text-[12px]">
-                  67%
-                </p>
-              </div>
-
-              <div className="bg-neutral-200 rounded-[20px]">
-                <div
-                  style={{ width: `67%` }}
-                  className="rounded-[20px] bg-gradient-to-r from-[#3D9F8E] to-[#177766] h-3"
-                ></div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-row justify-between items-center">
-                <p className="lg:text-[18px] text-[14px]">Ego</p>
-                <p className="bg-[#E6F6F4] px-2.5 py-[5px] text-[#007F6D] font-semibold rounded-[5px] lg:text-[16px] text-[12px]">
-                  67%
-                </p>
-              </div>
-              <div className="bg-neutral-200 rounded-[20px]">
-                <div
-                  style={{ width: `67%` }}
-                  className="rounded-[20px] bg-gradient-to-r from-[#3D9F8E] to-[#177766] h-3"
-                ></div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
         <div className="rounded-[10px] shadow-sm bg-neutral-50 px-5.5 pt-7 pb-13 flex-1">
@@ -83,30 +82,26 @@ export default function HasilJuz() {
             Arah Pengembangan Diri
           </p>
           <div className="space-y-2 mt-4">
-            <div className="flex gap-4">
-              <div className="w-3.75 h-3.75 bg-neutral-300 rounded-full flex-shrink-0 mt-2"></div>
-              <div className="flex flex-col">
-                <p className="font-bold lg:text-[18px] text-[14px]">
-                  Menjaga batas emosional diri
-                </p>
-                <p className="lg:text-[18px] text-[14px]">
-                  Belajar mengenali kapan perlu hadir untuk orang lain dan kapan
-                  perlu memberi ruang untuk diri sendiri.
-                </p>
+            {(result.advice
+              ? [result.advice]
+              : result.development_advice
+                ? [result.development_advice]
+                : []
+            ).map((ad: string, i: number) => (
+              <div key={i} className="flex gap-4">
+                <div className="w-3.75 h-3.75 bg-neutral-300 rounded-full flex-shrink-0 mt-2" />
+                <div className="flex flex-col">
+                  <p className="font-bold lg:text-[18px] text-[14px]">
+                    Saran {i + 1}
+                  </p>
+                  <p className="lg:text-[18px] text-[14px]">{ad}</p>
+                </div>
               </div>
-            </div>
-            <div className="flex gap-4">
-              <div className="w-3.75 h-3.75 bg-neutral-300 rounded-full flex-shrink-0 mt-2"></div>
-              <div className="flex flex-col">
-                <p className="font-bold lg:text-[18px] text-[14px]">
-                  Mengungkapkan perasaan dengan lebih jujur
-                </p>
-                <p className="lg:text-[18px] text-[14px]">
-                  Melatih keberanian menyampaikan kebutuhan tanpa rasa bersalah
-                  atau takut mengecewakan.
-                </p>
-              </div>
-            </div>
+            ))}
+            {/* fallback message */}
+            {!result.advice && !result.development_advice && (
+              <p className="text-[14px]">Tidak ada saran khusus.</p>
+            )}
           </div>
         </div>
       </div>
