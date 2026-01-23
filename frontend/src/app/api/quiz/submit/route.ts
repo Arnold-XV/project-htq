@@ -23,7 +23,8 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!answers || !Array.isArray(answers) || answers.length === 0) {
+    // Layer 4 (tie-breaker) doesn't need answers array, just tiebreakerAnswer
+    if (layer !== 4 && (!answers || !Array.isArray(answers) || answers.length === 0)) {
       return NextResponse.json(
         { error: 'Answers array is required' },
         { status: 400 }
@@ -47,19 +48,24 @@ export async function POST(request: Request) {
       );
     }
 
-    // Fetch option values to calculate scores
-    const optionIds = answers.map((a) => a.option_id);
-    const { data: options, error: optionsError } = await supabase
-      .from('quiz_options')
-      .select('id, option_value, points')
-      .in('id', optionIds);
+    // Fetch option values to calculate scores (skip for Layer 4 - tie-breaker)
+    let options: any[] = [];
+    if (layer !== 4) {
+      const optionIds = answers.map((a) => a.option_id);
+      const { data: fetchedOptions, error: optionsError } = await supabase
+        .from('quiz_options')
+        .select('id, option_value, points')
+        .in('id', optionIds);
 
-    if (optionsError) {
-      console.error('Options fetch error:', optionsError);
-      return NextResponse.json(
-        { error: 'Failed to fetch answer options' },
-        { status: 500 }
-      );
+      if (optionsError) {
+        console.error('Options fetch error:', optionsError);
+        return NextResponse.json(
+          { error: 'Failed to fetch answer options' },
+          { status: 500 }
+        );
+      }
+
+      options = fetchedOptions || [];
     }
 
     // Process based on layer
