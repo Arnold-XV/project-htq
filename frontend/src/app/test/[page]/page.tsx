@@ -24,6 +24,9 @@ export default function TestPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [isTieBreaker, setIsTieBreaker] = useState<boolean>(false);
+  const [tiebreakerAnswer, setTiebreakerAnswer] = useState<"A" | "B" | null>(
+    null,
+  );
   const searchParams = useSearchParams();
   const [branchCategory, setBranchCategory] = useState<string | null>(() => {
     try {
@@ -62,6 +65,39 @@ export default function TestPage() {
   useEffect(() => {
     let mounted = true;
 
+    const tryLoadPersistedTieBreaker = (): boolean => {
+      try {
+        const sp = searchParams;
+        const pJuzA = sp?.get("juzA");
+        const pJuzB = sp?.get("juzB");
+        if (page === 4 && (pJuzA || pJuzB)) {
+          const raw =
+            typeof window !== "undefined"
+              ? localStorage.getItem("lastTieBreakerQuestions")
+              : null;
+          const rawParams =
+            typeof window !== "undefined"
+              ? localStorage.getItem("lastTieBreakerParams")
+              : null;
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (mounted) {
+              setQuestions(parsed);
+              setIsTieBreaker(true);
+            }
+            return true;
+          }
+        }
+      } catch {}
+      return false;
+    };
+
+    if (tryLoadPersistedTieBreaker()) {
+      return () => {
+        mounted = false;
+      };
+    }
+
     const fetchQuestionsForLayer = async (layerToFetch: number) => {
       setLoading(true);
       setError(null);
@@ -80,17 +116,44 @@ export default function TestPage() {
           credentials: "include",
         });
 
-        if (res.status === 401) {
-          router.push("/login");
+        if (!res.ok) {
+          const rawText = await res.text().catch(() => "");
+          console.error("Failed fetching questions:", {
+            url,
+            status: res.status,
+            body: rawText,
+          });
+          throw new Error(
+            rawText || `Failed to fetch questions (status ${res.status})`,
+          );
+        }
+
+        const qText = await res.text().catch(() => "");
+        let qjson: any = {};
+        try {
+          qjson = qText ? JSON.parse(qText) : {};
+        } catch (parseErr) {
+          qjson = { raw: qText };
+          console.error("Failed to parse next-layer response JSON", {
+            url,
+            parseErr,
+            raw: qText,
+          });
+        }
+        if (!res.ok) {
+          console.error("Next-layer questions fetch failed:", {
+            url,
+            status: res.status,
+            body: qjson,
+          });
+          setError(
+            qjson.error ||
+              qjson.raw ||
+              `Gagal mengambil pertanyaan layer berikutnya (status ${res.status})`,
+          );
           return;
         }
-
-        const json = await res.json();
-        if (!res.ok) {
-          throw new Error(json.error || "Failed to fetch questions");
-        }
-
-        const fetchedQuestions = normalize(json.questions || json);
+        const fetchedQuestions = normalize(qjson.questions || qjson);
         if (mounted) {
           if (
             !fetchedQuestions ||
@@ -128,7 +191,6 @@ export default function TestPage() {
   }, [router, page, branchCategory]);
 
   const pageQs = questions.slice(start, questions.length);
-  console.log("pageQs:", pageQs);
   const setAnswer = (qKey: string | number, value: string) =>
     setAnswers(qKey as number, value);
 
@@ -136,6 +198,9 @@ export default function TestPage() {
     const key = q.id ?? start + idx;
     return answers?.[key] !== undefined && answers?.[key] !== "";
   });
+  const allAnsweredForSubmit = isTieBreaker
+    ? tiebreakerAnswer !== null
+    : allAnswered;
 
   const totalPages = TOTAL_PAGES;
 
@@ -160,31 +225,42 @@ export default function TestPage() {
 
       const currentQuestionIds = new Set(questions.map((q) => String(q.id)));
       const answersArray = Object.entries(answers || {})
-        .filter(([k, v]) => currentQuestionIds.has(String(k)))
-        .map(([k, v]) => ({
-          question_id: Number(k),
-          option_id: Number(v),
-        }));
+        .filter(([k]) => currentQuestionIds.has(String(k)))
+        .map(([k, v]) => {
+          const opt = String(v ?? "");
+          const numericMatch = opt.match(/^\d+$/);
+          return {
+            question_id: Number(k),
+            option_id: numericMatch ? Number(opt) : opt,
+          };
+        })
+        .filter((a) => typeof a.option_id === "number");
 
-      if (answersArray.length === 0) {
-        setError("Tidak ada jawaban untuk dikirim pada layer ini.");
+      if (!isTieBreaker && answersArray.length === 0) {
+        setError("Tidak ada jawaban numerik untuk dikirim pada layer ini.");
         return;
       }
 
-      let payload: any;
-      if (page === 1) {
+      let payload: any = null;
+      if (isTieBreaker || page === 4) {
+        if (!tiebreakerAnswer) {
+          setError("Silakan pilih jawaban tie-breaker (A atau B).");
+          return;
+        }
         payload = {
-          layer: 1,
-          answers: answersArray,
-          anonUserId: anonUserId,
+          layer: 4,
+          answers: [],
+          resultId: resultId ?? undefined,
+          anonUserId: anonUserId ?? undefined,
+          tiebreakerAnswer: tiebreakerAnswer,
         };
       } else {
         payload = {
           layer: page,
           answers: answersArray,
-          anonUserId: anonUserId,
+          anonUserId: anonUserId ?? undefined,
         };
-        if (resultId) payload.resultId = resultId;
+        if (page > 1 && resultId) payload.resultId = resultId;
       }
 
       Object.keys(payload).forEach(
@@ -192,8 +268,6 @@ export default function TestPage() {
           (payload[k] === undefined || payload[k] === null) &&
           delete payload[k],
       );
-
-      console.log("POST /api/quiz/submit payload:", payload);
 
       const res = await fetch("/api/quiz/submit", {
         method: "POST",
@@ -209,6 +283,15 @@ export default function TestPage() {
         json = raw ? JSON.parse(raw) : {};
       } catch (e) {
         json = { error: "Invalid JSON response", raw };
+      }
+
+      if (json.branch_category) {
+        try {
+          setBranchCategory(String(json.branch_category));
+        } catch {}
+        try {
+          localStorage.setItem("branchCategory", String(json.branch_category));
+        } catch {}
       }
 
       if (!res.ok) {
@@ -239,6 +322,23 @@ export default function TestPage() {
         /quiz completed/i.test(json.message || "")
       ) {
         const idToShow = returnedResultId;
+        try {
+          const payloadToStore = {
+            ...json,
+            branch_category:
+              json.branch_category ??
+              branchCategory ??
+              (typeof window !== "undefined"
+                ? localStorage.getItem("branchCategory")
+                : null) ??
+              null,
+          };
+          localStorage.setItem(
+            "lastResultPayload",
+            JSON.stringify(payloadToStore),
+          );
+          console.log("Saved lastResultPayload", payloadToStore);
+        } catch {}
         if (idToShow) {
           router.push(`/result?id=${encodeURIComponent(idToShow)}`);
           return;
@@ -262,30 +362,88 @@ export default function TestPage() {
             localStorage.setItem("tiebreaker_juzA", String(params.juzA));
           if (params.juzB)
             localStorage.setItem("tiebreaker_juzB", String(params.juzB));
+          localStorage.setItem("lastResultPayload", JSON.stringify(json));
         } catch {}
 
         if (params.juzA && params.juzB) {
+          const juzA =
+            params.juzA ?? params.juz_a ?? json.top_juz_1 ?? json.top_juz1;
+          const juzB =
+            params.juzB ?? params.juz_b ?? json.top_juz_2 ?? json.top_juz2;
+
+          if (!juzA || !juzB) {
+            setError("Missing tie-breaker parameters.");
+            return;
+          }
+
           const tbr = await fetch(
-            `/api/quiz/tie-breaker?juzA=${encodeURIComponent(params.juzA)}&juzB=${encodeURIComponent(params.juzB)}`,
+            `/api/quiz/tie-breaker?juzA=${encodeURIComponent(String(juzA))}&juzB=${encodeURIComponent(String(juzB))}`,
             { method: "GET", credentials: "include" },
           );
+
           const tbJson = await tbr.json();
-          if (
-            tbr.ok &&
-            Array.isArray(tbJson.questions) &&
-            tbJson.questions.length > 0
-          ) {
-            const tbq = normalize(tbJson.questions);
-            setQuestions(tbq);
-            setIsTieBreaker(true);
-            router.push(
-              `/test/4?juzA=${encodeURIComponent(params.juzA)}&juzB=${encodeURIComponent(params.juzB)}`,
-            );
-            return;
-          } else {
+
+          if (!tbr.ok) {
             setError(tbJson.error || "Gagal mengambil tie-breaker questions.");
             return;
           }
+
+          // API returns { tiebreaker: {...}, layer:4, description: ... }
+          const tb =
+            tbJson.tiebreaker ||
+            tbJson.tiebreakerQuestion ||
+            tbJson.tiebreaker_question;
+          if (!tb) {
+            setError("Tie-breaker question not found in response.");
+            return;
+          }
+
+          // convert tie-breaker shape to the quiz question shape used by the UI
+          const tbQuestion = {
+            id: tb.id ?? 0,
+            question_text:
+              tb.question_text ?? tb.question ?? "Pertanyaan tie-breaker",
+            branch_category: null,
+            order_number: 1,
+            quiz_options: [
+              {
+                id: `A_${tb.id}`,
+                points: 0,
+                option_text:
+                  tb.option_a_description ?? tb.optionA ?? "Pilihan A",
+                option_value: "A",
+                order_number: 1,
+              },
+              {
+                id: `B_${tb.id}`,
+                points: 0,
+                option_text:
+                  tb.option_b_description ?? tb.optionB ?? "Pilihan B",
+                option_value: "B",
+                order_number: 2,
+              },
+            ],
+          };
+
+          const tbq = normalize([tbQuestion]);
+          // persist tie-breaker payload so the remounted page can load it
+          try {
+            localStorage.setItem(
+              "lastTieBreakerQuestions",
+              JSON.stringify(tbq),
+            );
+            localStorage.setItem(
+              "lastTieBreakerParams",
+              JSON.stringify({ juzA: String(juzA), juzB: String(juzB) }),
+            );
+          } catch {}
+          setQuestions(tbq);
+          setIsTieBreaker(true);
+          // include juzA/juzB in URL so new page instance knows it's a tie-breaker page
+          router.push(
+            `/test/4?juzA=${encodeURIComponent(String(juzA))}&juzB=${encodeURIComponent(String(juzB))}`,
+          );
+          return;
         }
 
         if (json.tie_breaker?.questions || json.tieBreaker?.questions) {
@@ -314,10 +472,29 @@ export default function TestPage() {
           method: "GET",
           credentials: "include",
         });
-        const qjson = await qres.json();
+
+        const qText = await qres.text().catch(() => "");
+        let qjson: any = {};
+        try {
+          qjson = qText ? JSON.parse(qText) : {};
+        } catch (parseErr) {
+          qjson = { raw: qText };
+          console.error("Failed to parse next-layer response JSON", {
+            url,
+            parseErr,
+            raw: qText,
+          });
+        }
         if (!qres.ok) {
+          console.error("Next-layer questions fetch failed:", {
+            url,
+            status: qres.status,
+            body: qjson,
+          });
           setError(
-            qjson.error || "Gagal mengambil pertanyaan layer berikutnya.",
+            qjson.error ||
+              qjson.raw ||
+              `Gagal mengambil pertanyaan layer berikutnya (status ${qres.status})`,
           );
           return;
         }
@@ -365,7 +542,7 @@ export default function TestPage() {
     <div>
       <NavbarTestPage />
       <Link href="/">
-        <Button className="bg-neutral-25 text-neutral-800 rounded-[8px] lg:ml-14.5 ml-4.5 mt-30 mb-8 shadow-sm hover:bg-neutral-200">
+        <Button className="bg-neutral-25 text-neutral-800 !rounded-[8px] lg:ml-14.5 ml-4.5 mt-30 mb-8 shadow-sm hover:scale-105">
           <ChevronLeft className="mr-2" />
           <p className="text-sm text-neutral-800 font-bold">Keluar</p>
         </Button>
@@ -403,7 +580,27 @@ export default function TestPage() {
                             name={`q-${key}`}
                             value={optionId}
                             checked={answers?.[key] === optionId}
-                            onChange={() => setAnswer(key, optionId)}
+                            onChange={() => {
+                              setAnswer(key, optionId);
+                              if (isTieBreaker) {
+                                const val =
+                                  opt.value ?? opt.option_value ?? null;
+                                if (val === "A" || val === "B") {
+                                  setTiebreakerAnswer(val);
+                                } else {
+                                  const inferred = String(optionId).startsWith(
+                                    "A_",
+                                  )
+                                    ? "A"
+                                    : String(optionId).startsWith("B_")
+                                      ? "B"
+                                      : null;
+                                  setTiebreakerAnswer(
+                                    inferred as "A" | "B" | null,
+                                  );
+                                }
+                              }
+                            }}
                             className={`w-6 h-6 flex-shrink-0  ${
                               clicked ? "accent-background-2" : ""
                             }`}
@@ -424,9 +621,10 @@ export default function TestPage() {
       <div className="bg-neutral-25 border-1 border-neutral-100 mt-15">
         <div className="mt-6 flex flex-row justify-between lg:mx-19.25 mx-4.5 gap-3">
           <BackButton prev={prev} page={page} />
+
           <NextButton
             next={next}
-            allAnswered={allAnswered}
+            allAnswered={allAnsweredForSubmit}
             page={page}
             questions={questions}
             totalPages={totalPages}

@@ -13,7 +13,7 @@ export default function BackButton({
     <Button
       onClick={prev}
       disabled={page === 1}
-      className="px-4 py-2 rounded-[8px] bg-neutral-25 text-neutral-700 disabled:opacity-50 flex flex-row"
+      className="px-4 py-2 rounded-[8px] bg-neutral-25 text-neutral-700 disabled:opacity-50 flex flex-row hover:scale-105"
     >
       <ArrowLeft className="mr-2" />
       <p>Sebelumnya</p>

@@ -18,59 +18,45 @@ export default function Result() {
 
   useEffect(() => {
     let mounted = true;
-    const fetchResult = async () => {
+    const loadFromLocal = async () => {
       setLoading(true);
       try {
-        const res = await fetch(
-          `/api/quiz/results/${id ? `?id=${decodeURIComponent(id)}` : ""}`,
-          {
-            credentials: "include",
-          },
-        );
-
-        if (res.status === 401) {
-          const anonUserId =
-            typeof window !== "undefined"
-              ? localStorage.getItem("anonUserId")
-              : null;
-          if (!anonUserId) {
+        const raw =
+          typeof window !== "undefined"
+            ? localStorage.getItem("lastResultPayload")
+            : null;
+        if (raw) {
+          try {
+            const payload = JSON.parse(raw);
+            const immediateResult = {
+              id: payload.result_id || payload.resultId || null,
+              final_juz: payload.final_juz ?? null,
+              juz_scores: payload.juz_scores ?? null,
+              personality: payload.personality ?? null,
+              completed: payload.completed ?? null,
+              _rawSubmitPayload: payload,
+            };
             if (mounted) {
-              setError("Unauthorized access. Please log in or take the quiz.");
-              return;
+              console.log("Loaded result from localStorage", immediateResult);
+              setResult(immediateResult);
             }
+            // DO NOT remove the key here — keep it so remounts / Fast Refresh still find it
+            return;
+          } catch (e) {
+            console.warn("Invalid lastResultPayload", e);
           }
-          const anonRes = await fetch(
-            `/api/quiz/results/anonymous?anonUserId=${encodeURIComponent(anonUserId!)}`,
-          );
-          const anonJson = await anonRes.json();
-          const list: any[] = anonJson.results || [];
-          let found = null;
-          if (id) found = list.find((r) => String(r.id) === String(id));
-          if (!found) found = list[0] ?? null;
-          if (mounted) setResult(found);
-          return;
         }
-
-        const json = await res.json();
-        if (!res.ok) {
-          if (mounted) setError(json.error || "Failed to fetch result");
-          return;
-        }
-        const payloadResult =
-          json.result ?? (Array.isArray(json.results) ? json.results[0] : null);
-        if (mounted) setResult(payloadResult);
-      } catch (err: any) {
-        if (mounted) setError(err.message ?? "Error loading result");
+        if (mounted) setResult(null);
       } finally {
         if (mounted) setLoading(false);
       }
     };
 
-    fetchResult();
+    loadFromLocal();
     return () => {
       mounted = false;
     };
-  }, [id, router]);
+  }, []);
   return (
     <div className="lg:mx-21 md:mx-10 mx-5">
       {loading && <p>Loading result...</p>}

@@ -8,7 +8,19 @@ import { RefreshCcw } from "lucide-react";
 export default function RestartTest() {
   const router = useRouter();
   function handleClick() {
-    router.push("/test/");
+    try {
+      localStorage.removeItem("lastResultPayload");
+      localStorage.removeItem("htq-answers");
+      localStorage.removeItem("quizResultId");
+      localStorage.removeItem("anonUserId");
+      localStorage.removeItem("branchCategory");
+      localStorage.removeItem("lastTieBreakerQuestions");
+      localStorage.removeItem("lastTieBreakerParams");
+    } catch {}
+    router.push("/test/1");
+    if (typeof window !== "undefined") {
+      window.location.reload();
+    }
   }
   return (
     <Button

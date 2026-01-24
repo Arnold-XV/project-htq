@@ -1,30 +1,34 @@
 import React from "react";
 
-interface ProgressBarProps {
-  currentPage: number;
-  totalPages: number;
-}
-
 export default function ProgressBar({
   currentPage,
   totalPages,
-}: ProgressBarProps) {
-  const progressPercentage = Math.round((currentPage / totalPages) * 100);
+}: {
+  currentPage: number;
+  totalPages: number;
+}) {
+  const displayedPage = Math.min(
+    Math.max(1, currentPage || 1),
+    Math.max(1, totalPages || 1),
+  );
+  const percent =
+    totalPages && totalPages > 0
+      ? Math.min(100, Math.round((displayedPage / totalPages) * 100))
+      : 100;
+
   return (
     <div className="w-full">
-      <div className="flex flex-row justify-between">
-        <div className="mb-2">
-          <p className="lg:text-[16px] text-xs">
-            halaman {currentPage}/{totalPages}
-          </p>
+      <div className="flex items-center justify-between mb-3">
+        <div className="text-sm font-medium">
+          {displayedPage}/{totalPages}
         </div>
-        <p className="lg:text-[18px] text-xs">{progressPercentage}%</p>
+        <div className="text-sm text-neutral-500">{percent}%</div>
       </div>
-      <div className="bg-[#E6F6F4] rounded-[20px]">
+      <div className="w-full bg-neutral-200 h-3 rounded-full overflow-hidden">
         <div
-          style={{ width: `${progressPercentage}%` }}
-          className="rounded-[20px] bg-gradient-to-r from-[#3D9F8E] to-[#124F44] transition-all duration-300 h-2.5"
-        ></div>
+          className="h-full bg-gradient-to-r from-[#3D9F8E] to-[#177766]"
+          style={{ width: `${percent}%` }}
+        />
       </div>
     </div>
   );

@@ -5,35 +5,44 @@ export default function HasilJuz({ result }: { result?: any }) {
     return null;
   }
 
-  const title = result.title ?? result.personality_type ?? "Hasil";
-  const juz = result.juz_result ?? result.juz ?? "-";
-  const description = result.description ?? "Deskripsi tidak tersedia.";
+  const personality = result.personality ?? {};
 
-  const rawScores = result.scores ?? {};
-  let scoresArr: { label: string; percent: number }[] = [];
+  const juz = personality.juz_number ?? "-";
+  const name = personality.name ?? "Hasil";
+  const description = personality.description ?? "Deskripsi tidak tersedia.";
+  const strengths: string[] = personality.strengths ?? [];
+  const challenges: string[] = personality.challenges ?? [];
 
-  if (Array.isArray(rawScores)) {
-    scoresArr = rawScores.map((s: any) =>
-      typeof s === "number"
-        ? { label: "Score", percent: s }
-        : { label: s.label ?? "Score", percent: s.percent ?? 0 },
-    );
-  } else if (rawScores && typeof rawScores === "object") {
-    scoresArr = Object.entries(rawScores).map(([k, v]) => ({
-      label: k,
-      percent: Number(v) || 0,
-    }));
-  } else {
-    const fallbackLabels = [
-      "Karakteristik A",
-      "Karakteristik B",
-      "Karakteristik C",
-    ];
-    scoresArr = fallbackLabels.map((l, i) => ({
-      label: l,
-      percent: Math.min(80, 40 + i * 10),
-    }));
-  }
+  const branch: string | null =
+    (result.branch_category as string) ??
+    (result._rawSubmitPayload?.branch_category as string) ??
+    (result._rawSubmitPayload?.branch as string) ??
+    (typeof window !== "undefined"
+      ? localStorage.getItem("branchCategory")
+      : null) ??
+    null;
+
+  const egoLevel =
+    branch && branch.length >= 2
+      ? branch.charAt(1) === "H"
+        ? "HIGH"
+        : "LOW"
+      : null;
+  const neoLevel =
+    branch && branch.length >= 4
+      ? branch.charAt(3) === "H"
+        ? "HIGH"
+        : "LOW"
+      : null;
+
+  const percentForLevel = (level: string | null) =>
+    level === "HIGH" ? 100 : level === "LOW" ? 0 : 0;
+
+  const scoresArr: { label: string; percent: number }[] = [
+    { label: "EGO", percent: percentForLevel(egoLevel) },
+    { label: "NEO", percent: percentForLevel(neoLevel) },
+  ];
+
   return (
     <div className="flex flex-col gap-7 mt-4.5">
       <div className="shadow-sm">
@@ -43,14 +52,39 @@ export default function HasilJuz({ result }: { result?: any }) {
           style={{ backgroundImage: "url(/image/juz-result-bg.webp)" }}
         >
           <h4 className="font-bold lg:text-[38px] text-[26px] z-1">
-            Juz {juz} - {title}
+            Juz {juz} - {name}
           </h4>
           <p className="lg:text-[22px] text-[16px] z-1">{description}</p>
         </div>
         <div className="pl-10.75 pr-8.5 pt-9.25 pb-13">
-          <p className="text-center lg:text-[18px] text-[14px]">
-            {description}
-          </p>
+          <div className="text-center lg:text-[18px] text-[14px] flex flex-col gap-4 items-start">
+            <div className="">
+              <span className="font-bold">Strengths: </span>
+              {strengths.length > 0 ? (
+                strengths.map((strength, i) => (
+                  <span key={i}>
+                    <span>{strength}</span>
+                    {strengths.length - 1 !== i && <span>, </span>}
+                  </span>
+                ))
+              ) : (
+                <p></p>
+              )}
+            </div>
+            <div>
+              <span className="font-bold">Challenges: </span>
+              {challenges.length > 0 ? (
+                challenges.map((challenge, i) => (
+                  <span key={i}>
+                    <span>{challenge}</span>
+                    {challenges.length - 1 !== i && <span>, </span>}
+                  </span>
+                ))
+              ) : (
+                <p></p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
       <div className="flex lg:flex-row flex-col items-stretch justify-center gap-[25px]">
@@ -59,22 +93,24 @@ export default function HasilJuz({ result }: { result?: any }) {
             Karakteristik Utama
           </p>
           <div className="w-full flex flex-col gap-2 mt-2">
-            {scoresArr.map((s, i) => (
-              <div key={i} className="flex flex-col gap-2">
-                <div className="flex flex-row justify-between items-center">
-                  <p className="lg:text-[18px] text-[14px]">{s.label}</p>
-                  <p className="bg-[#E6F6F4] px-2.5 py-[5px] text-[#007F6D] font-semibold rounded-[5px] lg:text-[16px] text-[12px]">
-                    {s.percent}%
-                  </p>
+            {scoresArr.map(
+              (s: { label: string; percent: number }, i: number) => (
+                <div key={i} className="flex flex-col gap-2">
+                  <div className="flex flex-row justify-between items-center">
+                    <p className="lg:text-[18px] text-[14px]">{s.label}</p>
+                    <p className="bg-[#E6F6F4] px-2.5 py-[5px] text-[#007F6D] font-semibold rounded-[5px] lg:text-[16px] text-[12px]">
+                      {s.percent}%
+                    </p>
+                  </div>
+                  <div className="bg-neutral-200 rounded-[20px]">
+                    <div
+                      style={{ width: `${s.percent}%` }}
+                      className="rounded-[20px] bg-gradient-to-r from-[#3D9F8E] to-[#177766] h-3"
+                    />
+                  </div>
                 </div>
-                <div className="bg-neutral-200 rounded-[20px]">
-                  <div
-                    style={{ width: `${s.percent}%` }}
-                    className="rounded-[20px] bg-gradient-to-r from-[#3D9F8E] to-[#177766] h-3"
-                  />
-                </div>
-              </div>
-            ))}
+              ),
+            )}
           </div>
         </div>
         <div className="rounded-[10px] shadow-sm bg-neutral-50 px-5.5 pt-7 pb-13 flex-1">
@@ -82,24 +118,15 @@ export default function HasilJuz({ result }: { result?: any }) {
             Arah Pengembangan Diri
           </p>
           <div className="space-y-2 mt-4">
-            {(result.advice
-              ? [result.advice]
-              : result.development_advice
-                ? [result.development_advice]
-                : []
-            ).map((ad: string, i: number) => (
-              <div key={i} className="flex gap-4">
-                <div className="w-3.75 h-3.75 bg-neutral-300 rounded-full flex-shrink-0 mt-2" />
-                <div className="flex flex-col">
-                  <p className="font-bold lg:text-[18px] text-[14px]">
-                    Saran {i + 1}
-                  </p>
-                  <p className="lg:text-[18px] text-[14px]">{ad}</p>
-                </div>
+            {personality.development_advice ? (
+              <div className="flex gap-4">
+                <p className="lg:text-[18px] text-[14px]">
+                  {personality.development_advice}
+                </p>
               </div>
-            ))}
+            ) : null}
             {/* fallback message */}
-            {!result.advice && !result.development_advice && (
+            {!personality.development_advice && (
               <p className="text-[14px]">Tidak ada saran khusus.</p>
             )}
           </div>
