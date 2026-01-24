@@ -16,7 +16,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"email\": \"user@example.com\",\n  \"name\": \"Nama Pengguna\",\n  \"date_of_birth\": \"1990-01-15\",\n  \"photo_url\": \"https://example.com/photo.jpg\"\n}"
+          "raw": "{\n  \"email\": \"testuser123@gmail.com\",\n  \"name\": \"Nama Pengguna\",\n  \"date_of_birth\": \"1990-01-15\",\n  \"photo_url\": \"https://example.com/photo.jpg\"\n}"
         },
         "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api","auth","register"] },
         "description": "Register new user without password. User fills: name, email, date_of_birth, photo_url (optional). System auto-generates password and logs user in automatically."
@@ -28,8 +28,9 @@
       "request": {
         "method": "POST",
         "header": [ { "key": "Content-Type", "value": "application/json" } ],
-        "body": { "mode": "raw", "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"P@ssw0rd!\"\n}" },
-        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] }
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"testuser123@gmail.com\",\n  \"password\": \"P@ssw0rd!\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] },
+        "description": "NOTE: Regular users don't need this endpoint (they auto-login after register). This is for:\n- Testing/development purposes\n- Admin access with known passwords\n- Session refresh if user session expires\n\nUsers don't know their password (auto-generated during register)."
       }
     },
     {
@@ -37,7 +38,8 @@
       "request": {
         "method": "POST",
         "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{bearerToken}}" } ],
-        "url": { "raw": "{{baseUrl}}/api/auth/logout", "host": ["{{baseUrl}}"], "path": ["api","auth","logout"] }
+        "url": { "raw": "{{baseUrl}}/api/auth/logout", "host": ["{{baseUrl}}"], "path": ["api","auth","logout"] },
+        "description": "NOTE: Optional endpoint. Clears session token. In most cases, frontend can just remove the bearerToken locally without calling this API."
       }
     },
     {
@@ -45,7 +47,8 @@
       "request": {
         "method": "GET",
         "header": [ { "key": "Authorization", "value": "Bearer {{bearerToken}}" } ],
-        "url": { "raw": "{{baseUrl}}/api/user/profile", "host": ["{{baseUrl}}"], "path": ["api","user","profile"] }
+        "url": { "raw": "{{baseUrl}}/api/user/profile", "host": ["{{baseUrl}}"], "path": ["api","user","profile"] },
+        "description": "Get authenticated user's profile data. Requires valid bearerToken from register response."
       }
     },
     {
@@ -54,7 +57,8 @@
         "method": "PATCH",
         "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{bearerToken}}" } ],
         "body": { "mode": "raw", "raw": "{\n  \"name\": \"Nama Baru\",\n  \"bio\": \"Bio singkat\"\n}" },
-        "url": { "raw": "{{baseUrl}}/api/user/profile", "host": ["{{baseUrl}}"], "path": ["api","user","profile"] }
+        "url": { "raw": "{{baseUrl}}/api/user/profile", "host": ["{{baseUrl}}"], "path": ["api","user","profile"] },
+        "description": "NOTE: Optional for quiz flow. Update user profile (name, bio, etc). Not required for taking the quiz."
       }
     },
     {
@@ -62,8 +66,9 @@
       "request": {
         "method": "POST",
         "header": [ { "key": "Authorization", "value": "Bearer {{bearerToken}}" } ],
-        "body": { "mode": "formdata", "formdata": [ { "key": "file", "type": "file" } ] },
-        "url": { "raw": "{{baseUrl}}/api/user/upload-photo", "host": ["{{baseUrl}}"], "path": ["api","user","upload-photo"] }
+        "body": { "mode": "formdata", "formdata": [ { "key": "file", "type": "file", "description": "Select image file" } ] },
+        "url": { "raw": "{{baseUrl}}/api/user/upload-photo", "host": ["{{baseUrl}}"], "path": ["api","user","upload-photo"] },
+        "description": "NOTE: Optional for quiz flow. Upload profile photo. Can be done during register via photo_url field instead. This endpoint requires multipart form-data file upload."
       }
     },
     {
@@ -76,7 +81,8 @@
           "host": ["{{baseUrl}}"], 
           "path": ["api","quiz","questions"], 
           "query": [ { "key": "layer", "value": "1", "description": "Layer 1: Extraversion (11 questions)" } ] 
-        }
+        },
+        "description": "REQUIRED for quiz flow. Fetch Layer 1 questions (Extraversion). Can be called without authentication."
       }
     },
     {
@@ -89,7 +95,8 @@
           "host": ["{{baseUrl}}"], 
           "path": ["api","quiz","questions"], 
           "query": [ { "key": "layer", "value": "2", "description": "Layer 2: Ego (5Q) + Neuroticism (5Q)" } ] 
-        }
+        },
+        "description": "REQUIRED for quiz flow. Fetch Layer 2 questions (EGO + Neuroticism). Can be called without authentication."
       }
     },
     {
@@ -105,7 +112,8 @@
             { "key": "layer", "value": "3", "description": "Layer 3: Branch questions" },
             { "key": "branch", "value": "EHNH", "description": "Branch code (EHNH/EHNL/ELNH/ELNL)" }
           ] 
-        }
+        },
+        "description": "NOTE: branch parameter might not be implemented yet in current schema. For now, Layer 3 returns all Juz selection questions regardless of branch. Check backend implementation."
       }
     },
     {
@@ -121,7 +129,8 @@
             { "key": "juzA", "value": "12", "description": "First Juz number" },
             { "key": "juzB", "value": "14", "description": "Second Juz number" }
           ] 
-        }
+        },
+        "description": "CONDITIONAL: Only needed if Layer 3 submission returns had_tie=true. Get tie-breaker question for specific Juz pair."
       }
     },
     {
