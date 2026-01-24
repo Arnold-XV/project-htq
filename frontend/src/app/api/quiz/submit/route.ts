@@ -1,4 +1,4 @@
-// API Route: Submit Quiz Answers - 4-Layer System (Supports Anonymous Users)
+// API Route: Submit Quiz Answers - 4-Layer System
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
@@ -6,14 +6,13 @@ interface SubmitRequest {
   layer: number;
   answers: { question_id: number; option_id: number }[];
   resultId?: string; // For continuing existing quiz
-  anonUserId?: string;
   tiebreakerAnswer?: 'A' | 'B'; // For Layer 4
 }
 
 export async function POST(request: Request) {
   try {
     const body: SubmitRequest = await request.json();
-    const { layer, answers, resultId, anonUserId, tiebreakerAnswer } = body;
+    const { layer, answers, resultId, tiebreakerAnswer } = body;
 
     // Validation
     if (!layer || layer < 1 || layer > 4) {
@@ -33,17 +32,14 @@ export async function POST(request: Request) {
 
     const supabase = await createClient();
 
-    // Check if user is authenticated
+    // Check if user is authenticated (required for quiz)
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
-    // Determine if this is an anonymous submission
-    const isAnonymous = !user && anonUserId;
-
-    if (!user && !anonUserId) {
+    if (!user) {
       return NextResponse.json(
-        { error: 'Either authentication or anonymous user ID is required' },
+        { error: 'Authentication required. Please register first.' },
         { status: 401 }
       );
     }
@@ -75,16 +71,9 @@ export async function POST(request: Request) {
 
       // Create new quiz result
       const resultData: any = {
+        user_id: user.id,
         extraversion_score: extraversionScore,
       };
-
-      if (isAnonymous) {
-        resultData.anon_user_id = anonUserId;
-        resultData.is_anonymous = true;
-      } else {
-        resultData.user_id = user!.id;
-        resultData.is_anonymous = false;
-      }
 
       const { data: result, error: resultError } = await supabase
         .from('quiz_results')
