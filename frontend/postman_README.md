@@ -2,6 +2,13 @@
 
 This folder contains a Postman collection and an environment file to help you test the backend API locally.
 
+## What's New (v2.1)
+- **Passwordless Registration**: No password required from users - system auto-generates
+- **Auto-login after register**: Users get session token immediately
+- **Removed anonymous flow**: All quiz submissions require authentication
+- **New field**: `date_of_birth` required during registration
+- **Removed**: Anonymous endpoints, merge-anonymous route
+
 Files:
 - `postman_collection.json` - Postman Collection (v2.1) with pre-built requests
 - `postman_environment.json` - (optional) environment variables example for Postman
@@ -13,60 +20,69 @@ How to import into Postman
 
 Variables used in the collection
 - `baseUrl` - e.g. `http://localhost:3000`
-- `bearerToken` - JWT token for authenticated endpoints
-- `anonUserId` - client-generated anonymous ID (format `anon_<uuid>`)
+- `bearerToken` - JWT token from register/login response (access_token)
+- `resultId` - Quiz result ID from Layer 1 submission
 
 Quick test flow
-1. Register a user using `Auth - Register` (POST)
-2. Login using `Auth - Login` (POST) and copy `access_token` to `bearerToken`
-3. Call `Quiz - Get Questions (subtest)` to fetch questions
-4. Submit quiz using `Quiz - Submit (authenticated)` or `Quiz - Submit (anonymous)`
-5. If anonymous, use `User - Merge Anonymous` after registering/logging in to migrate results
+1. **Register** using `Auth - Register (Start Quiz)` → copy `session.access_token` to `bearerToken`
+2. **Get Layer 1 questions** using `Quiz - Layer 1: Get Extraversion Questions`
+3. **Submit Layer 1** using `Quiz - Submit Layer 1` → copy `result_id` to `resultId`
+4. **Get Layer 2 questions** using `Quiz - Layer 2: Get Ego+Neuro Questions`
+5. **Submit Layer 2** → determines branch category (EHNH/EHNL/ELNH/ELNL)
+6. **Get Layer 3 questions** using `Quiz - Layer 3: Get Branch Questions`
+7. **Submit Layer 3** → calculates Juz scores (may trigger tie-breaker)
+8. **If tie**: Get tie-breaker question and submit Layer 4
+9. **Get results** using `Quiz - Get Results`
 
 Notes
-- Some endpoints require Authorization header: `Authorization: Bearer {{bearerToken}}`
-- For anonymous flows, set `anonUserId` to a generated value (e.g., `anon_123e4567-e89b-12d3-a456-426614174000`)
-
-If you need the environment file format, see `postman_environment.json`.
+- All quiz endpoints now require Authorization header: `Authorization: Bearer {{bearerToken}}`
+- User must register before starting quiz (no anonymous flow)
+- `date_of_birth` format: `YYYY-MM-DD`
 
 ---
 
 ## API Response Documentation
 
-### 🔐 Authentication Endpoints
+### Authentication Endpoints
 
-#### POST /api/auth/register
+#### POST /api/auth/register (Start Quiz)
 **Request Body:**
 ```json
 {
   "email": "user@example.com",
-  "password": "P@ssw0rd!",
-  "name": "Nama Pengguna"
+  "name": "Nama Pengguna",
+  "date_of_birth": "1990-01-15",
+  "photo_url": "https://example.com/photo.jpg"
 }
 ```
+> **Note**: `photo_url` is optional. No password required - system generates one automatically.
 
 **Success Response (201):**
 ```json
 {
-  "message": "User registered successfully",
+  "message": "Registration successful. You can now start the quiz.",
   "user": {
     "id": "uuid-string",
     "email": "user@example.com",
-    "name": "Nama Pengguna"
+    "name": "Nama Pengguna",
+    "date_of_birth": "1990-01-15",
+    "photo_url": "https://example.com/photo.jpg"
+  },
+  "session": {
+    "access_token": "eyJhbGc...",
+    "refresh_token": "eyJhbGc...",
+    "expires_in": 3600
   }
 }
 ```
+> **Action**: Copy `session.access_token` to Postman variable `{{bearerToken}}`
 
 **Error Responses:**
 - **400 Bad Request:**
   ```json
-  { "error": "Email, password, and name are required" }
+  { "error": "Email, name, and date of birth are required" }
   { "error": "Invalid email format" }
-  { "error": "Password must be at least 8 characters" }
-  ```
-- **409 Conflict:**
-  ```json
-  { "error": "Email already exists" }
+  { "error": "Invalid date format. Use YYYY-MM-DD" }
   ```
 
 ---
@@ -79,6 +95,7 @@ If you need the environment file format, see `postman_environment.json`.
   "password": "P@ssw0rd!"
 }
 ```
+> **Note**: Login still exists for admin/future use cases, but users don't know their password (auto-generated during register).
 
 **Success Response (200):**
 ```json
@@ -88,6 +105,7 @@ If you need the environment file format, see `postman_environment.json`.
     "id": "uuid-string",
     "email": "user@example.com",
     "name": "Nama Pengguna",
+    "date_of_birth": "1990-01-15",
     "photo_url": "https://storage.url/photo.jpg",
     "bio": "Bio text"
   },
@@ -129,7 +147,7 @@ If you need the environment file format, see `postman_environment.json`.
 
 ---
 
-### 👤 User Endpoints
+### User Endpoints
 
 #### GET /api/user/profile
 **Headers:** `Authorization: Bearer {token}`
@@ -255,7 +273,7 @@ file: [binary file data]
 
 ---
 
-### 📝 Quiz Endpoints
+### Quiz Endpoints
 
 #### GET /api/quiz/questions?subtest=1
 **Query Parameters:**
