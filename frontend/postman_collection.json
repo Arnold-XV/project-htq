@@ -100,7 +100,7 @@
       }
     },
     {
-      "name": "Quiz - Layer 3: Get Branch Questions (EHNH)",
+      "name": "Quiz - Layer 3: Get Questions (EHNH)",
       "request": {
         "method": "GET",
         "header": [],
@@ -110,10 +110,61 @@
           "path": ["api","quiz","questions"], 
           "query": [ 
             { "key": "layer", "value": "3", "description": "Layer 3: Branch questions" },
-            { "key": "branch", "value": "EHNH", "description": "Branch code (EHNH/EHNL/ELNH/ELNL)" }
+            { "key": "branch", "value": "EHNH", "description": "Ego High + Neuro High" }
           ] 
         },
-        "description": "NOTE: branch parameter might not be implemented yet in current schema. For now, Layer 3 returns all Juz selection questions regardless of branch. Check backend implementation."
+        "description": "REQUIRED for quiz flow. Fetch Layer 3 questions for EHNH branch (Ego High, Neuroticism High). Returns 5 questions. Branch parameter is REQUIRED - determined from Layer 2 results."
+      }
+    },
+    {
+      "name": "Quiz - Layer 3: Get Questions (EHNL)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { 
+          "raw": "{{baseUrl}}/api/quiz/questions?layer=3&branch=EHNL", 
+          "host": ["{{baseUrl}}"], 
+          "path": ["api","quiz","questions"], 
+          "query": [ 
+            { "key": "layer", "value": "3", "description": "Layer 3: Branch questions" },
+            { "key": "branch", "value": "EHNL", "description": "Ego High + Neuro Low" }
+          ] 
+        },
+        "description": "REQUIRED for quiz flow. Fetch Layer 3 questions for EHNL branch (Ego High, Neuroticism Low). Returns 5 questions. Branch parameter is REQUIRED - determined from Layer 2 results."
+      }
+    },
+    {
+      "name": "Quiz - Layer 3: Get Questions (ELNH)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { 
+          "raw": "{{baseUrl}}/api/quiz/questions?layer=3&branch=ELNH", 
+          "host": ["{{baseUrl}}"], 
+          "path": ["api","quiz","questions"], 
+          "query": [ 
+            { "key": "layer", "value": "3", "description": "Layer 3: Branch questions" },
+            { "key": "branch", "value": "ELNH", "description": "Ego Low + Neuro High" }
+          ] 
+        },
+        "description": "REQUIRED for quiz flow. Fetch Layer 3 questions for ELNH branch (Ego Low, Neuroticism High). Returns 5 questions. Branch parameter is REQUIRED - determined from Layer 2 results."
+      }
+    },
+    {
+      "name": "Quiz - Layer 3: Get Questions (ELNL)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { 
+          "raw": "{{baseUrl}}/api/quiz/questions?layer=3&branch=ELNL", 
+          "host": ["{{baseUrl}}"], 
+          "path": ["api","quiz","questions"], 
+          "query": [ 
+            { "key": "layer", "value": "3", "description": "Layer 3: Branch questions" },
+            { "key": "branch", "value": "ELNL", "description": "Ego Low + Neuro Low" }
+          ] 
+        },
+        "description": "REQUIRED for quiz flow. Fetch Layer 3 questions for ELNL branch (Ego Low, Neuroticism Low). Returns 5 questions. Branch parameter is REQUIRED - determined from Layer 2 results."
       }
     },
     {
