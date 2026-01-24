@@ -7,7 +7,7 @@ import { Calendar, ChevronLeft, Mail, Upload, User } from "react-feather";
 import { useForm, Controller } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { API_BASE_URL } from "@/lib/constants";
+//import { API_BASE_URL } from "@/lib/constants";
 
 type FormData = {
   name: string;
@@ -31,67 +31,73 @@ export default function Register() {
     setError,
   } = useForm<FormData>();
 
-const onSubmit = async (data: FormData) => {
-  if (!agree) {
-    setError("root", { message: "Kamu harus menyetujui Kebijakan Privasi" });
-    return;
-  }
+  const formatDate = (date: Date) => {
+    return date.toISOString().split("T")[0]; // YYYY-MM-DD
+  };  
 
-  if (!data.photo?.length) {
-    setError("photo", { message: "Foto wajib diupload" });
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    // ONBOARDING
-    const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: data.name,
-        email: data.email,
-        birthdate: data.birthdate,
-      }),
-    });
-
-    if (!res.ok) {
-      throw new Error("Gagal memulai tes");
+  const onSubmit = async (data: FormData) => {
+    if (!agree) {
+      setError("root", { message: "Kamu harus menyetujui Kebijakan Privasi" });
+      return;
     }
 
-    const result = await res.json();
-    const token = result.session?.access_token;
-
-    if (!token) {
-      throw new Error("Session tidak ditemukan");
+    if (!data.photo?.length) {
+      setError("photo", { message: "Foto wajib diupload" });
+      return;
     }
 
-    // UPLOAD FOTO
-    const fd = new FormData();
-    fd.append("file", data.photo[0]);
+    setLoading(true);
 
-    const uploadRes = await fetch(`${API_BASE_URL}/api/user/upload-photo`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: fd,
-    });
+    try {
+      // ONBOARDING
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          date_of_birth: formatDate(data.birthdate!),
+          photo_url: null,
+        }),
+      });
 
-    if (!uploadRes.ok) {
-      throw new Error("Upload foto gagal");
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("STATUS:", res.status);
+        console.error("RESPONSE:", text);
+      
+        throw new Error(text || "Gagal memulai tes");
+      }      
+
+      // UPLOAD FOTO
+      const fd = new FormData();
+      fd.append("file", data.photo[0]);
+
+      const uploadRes = await fetch("/api/user/upload-photo", {
+        method: "POST",
+        body: fd,
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error("Upload foto gagal");
+      }
+
+      // MULAI TEST
+      router.push("/test-page");
+    } catch (err: unknown) {
+      console.error(err);
+    
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Terjadi kesalahan, coba lagi";
+    
+      setError("root", { message });
+    } finally {
+      setLoading(false);
     }
-
-    // MULAI TEST
-    router.push("/test-page");
-  } catch (err) {
-    console.error(err);
-    setError("root", { message: "Terjadi kesalahan, coba lagi" });
-  } finally {
-    setLoading(false);
-  }
-};
+    
+  };
 
   return (
     <section className="h-screen bg-[var(--color-neutral-50)] items-center justify-center px-4 py-12 text-[var(--foreground)] relative flex flex-col">
