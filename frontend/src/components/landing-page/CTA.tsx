@@ -30,7 +30,7 @@ export default function CTA() {
           </p>
 
           <button className="mt-8 bg-[var(--foreground)] text-white px-13 py-2.5 rounded-lg cursor-pointer hover:bg-[var(--color-primary-700)] shadow-lg text-sm"
-          onClick={() => router.push("/register")}>
+          onClick={() => router.push("/auth/login")}>
             Mulai Test
           </button>
         </div>

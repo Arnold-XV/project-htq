@@ -43,7 +43,7 @@ export default function Hero() {
 
         <div className="font-plus-jakarta mt-8 flex flex-col flex-row justify-center gap-6 font-semibold">
           <m.button variants={heroActions} className="bg-[var(--color-primary-button)] text-white px-4 py-2 rounded-lg shadow-lg hover:bg-[var(--color-primary-700)] cursor-pointer inline-flex items-center justify-center"
-          onClick={() => router.push("/register")}>
+          onClick={() => router.push("/auth/login")}>
             Mulai Test <FaArrowRight className="ml-2" />
           </m.button>
           <m.button variants={heroActions} className="border border-[var(--foreground)] px-4 py-2 rounded-lg shadow-lg hover:bg-[var(--color-primary-300)] cursor-pointer text-[var(--foreground)]"
