@@ -19,7 +19,26 @@
           "raw": "{\n  \"email\": \"testuser123@gmail.com\",\n  \"name\": \"Nama Pengguna\",\n  \"date_of_birth\": \"1990-01-15\",\n  \"photo_url\": \"https://example.com/photo.jpg\"\n}"
         },
         "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api","auth","register"] },
-        "description": "Register new user without password. User fills: name, email, date_of_birth, photo_url (optional). System auto-generates password and logs user in automatically."
+        "description": "OLD: Register without file upload. For new implementation with photo upload, use 'Auth - Register with Photo Upload' endpoint instead."
+      },
+      "response": []
+    },
+    {
+      "name": "Auth - Register with Photo Upload (RECOMMENDED)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "email", "value": "testuser456@gmail.com", "type": "text", "description": "Valid email address" },
+            { "key": "name", "value": "Nama Pengguna", "type": "text", "description": "User's full name" },
+            { "key": "date_of_birth", "value": "1990-01-15", "type": "text", "description": "Format: YYYY-MM-DD" },
+            { "key": "file", "type": "file", "description": "Profile photo (JPEG/PNG/WebP, max 5MB) - OPTIONAL" }
+          ]
+        },
+        "url": { "raw": "{{baseUrl}}/api/auth/register-with-photo", "host": ["{{baseUrl}}"], "path": ["api","auth","register-with-photo"] },
+        "description": "RECOMMENDED: Sequential registration flow. Backend handles:\n1. Register user (create auth.users + users table)\n2. Upload photo if provided (automatic)\n3. Update users.photo_url\n\nReturns complete user profile with photo_url already populated. File upload is OPTIONAL - if not provided, user.photo_url will be null.\n\nResponse includes:\n- user.id, user.email, user.name, user.date_of_birth\n- user.photo_url (public URL if file uploaded)\n- session (auto-login)\n- steps_completed.registration & steps_completed.photo_upload"
       },
       "response": []
     },
