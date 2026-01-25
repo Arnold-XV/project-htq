@@ -15,7 +15,7 @@ export async function GET(request: Request) {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || origin;
     const callbackUrl = `${baseUrl}/api/auth/callback?next=${next}`;
     
-    console.log('🔵 Initiating OAuth with redirectTo:', callbackUrl);    https://quranic-personality-test.vercel.app/api/auth/callback    https://quranic-personality-test.vercel.app/api/auth/callback    https://quranic-personality-test.vercel.app/api/auth/callback    https://quranic-personality-test.vercel.app/api/auth/callback    https://quranic-personality-test.vercel.app/api/auth/callback    https://quranic-personality-test.vercel.app/api/auth/callback    https://quranic-personality-test.vercel.app/api/auth/callback    https://quranic-personality-test.vercel.app/api/auth/callback    https://quranic-personality-test.vercel.app/api/auth/callback    https://quranic-personality-test.vercel.app/api/auth/callback
+    console.log('🔵 Initiating OAuth with redirectTo:', callbackUrl);
 
     // Initiate Google OAuth sign in
     const { data, error } = await supabase.auth.signInWithOAuth({
