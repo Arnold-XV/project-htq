@@ -28,7 +28,7 @@ export default function Navbar() {
             <div className="flex items-center gap-3 font-semibold">
               <button
                 className="rounded-lg bg-[var(--color-primary-button)] px-6 py-2 text-white hover:bg-[var(--color-primary-700)] shadow-sm cursor-pointer"
-                onClick={() => router.push("/register")}
+                onClick={() => router.push("/auth/login")}
               >
                 Mulai Test
               </button>
@@ -58,7 +58,7 @@ export default function Navbar() {
             </div>
             <button
               className="rounded-lg bg-[var(--color-primary-button)] px-6 py-2 text-white shadow-sm mb-3"
-              onClick={() => router.push("/register")}
+              onClick={() => router.push("/auth/login")}
             >
               Mulai Test
             </button>
