@@ -21,7 +21,6 @@ export default function ShareButton() {
         ? document.getElementById("hasil-juz-root")
         : null;
     if (!el) {
-      alert("Elemen hasil tidak ditemukan.");
       return;
     }
     const { default: html2canvas } = await import("html2canvas");
@@ -68,7 +67,10 @@ export default function ShareButton() {
           </DialogTitle>
         </DialogHeader>
         <div className="flex flex-row justify-center gap-6">
-          <Button onClick={saveImage} className="flex flex-col items-center ">
+          <Button
+            onClick={saveImage}
+            className="flex flex-col items-center hover:scale-105"
+          >
             <div className="rounded-full bg-[#D9D9D9] flex p-8">
               <Download className="w-4 h-4" />
             </div>
@@ -76,7 +78,7 @@ export default function ShareButton() {
           </Button>
           <Button
             onClick={copyPayloadLink}
-            className="flex flex-col items-center"
+            className="flex flex-col items-center hover:scale-105"
           >
             <div className="rounded-full bg-[#D9D9D9] flex p-8">
               <Link className="w-4 h-4" />
