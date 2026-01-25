@@ -13,15 +13,18 @@ export async function GET(request: Request) {
 
     // Use environment variable for callback URL (or fallback to origin)
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || origin;
-    const callbackUrl = `${baseUrl}/api/auth/callback?next=${next}`;
+    const callbackUrl = `${baseUrl}/api/auth/callback`;
     
-    console.log('🔵 Initiating OAuth with redirectTo:', callbackUrl);
+    console.log('🔵 Initiating OAuth with redirectTo:', callbackUrl);    https://quranic-personality-test.vercel.app/api/auth/callback    https://quranic-personality-test.vercel.app/api/auth/callback    https://quranic-personality-test.vercel.app/api/auth/callback    https://quranic-personality-test.vercel.app/api/auth/callback    https://quranic-personality-test.vercel.app/api/auth/callback    https://quranic-personality-test.vercel.app/api/auth/callback    https://quranic-personality-test.vercel.app/api/auth/callback    https://quranic-personality-test.vercel.app/api/auth/callback    https://quranic-personality-test.vercel.app/api/auth/callback    https://quranic-personality-test.vercel.app/api/auth/callback
+    console.log('🔵 Origin:', origin);
+    console.log('🔵 Base URL:', baseUrl);
 
     // Initiate Google OAuth sign in
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: callbackUrl,
+        skipBrowserRedirect: false,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
