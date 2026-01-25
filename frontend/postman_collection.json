@@ -8,7 +8,58 @@
   },
   "item": [
     {
-      "name": "Auth - Register (Start Quiz)",
+      "name": "Auth - Google Login (STEP 1 - RECOMMENDED)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { 
+          "raw": "{{baseUrl}}/api/auth/google-login", 
+          "host": ["{{baseUrl}}"], 
+          "path": ["api","auth","google-login"] 
+        },
+        "description": "🔥 NEW FLOW (Google OAuth):\n\nSTEP 1: Initiate Google OAuth Login\n- Open this URL in browser (not Postman)\n- User will be redirected to Google consent screen\n- After authorization, Google redirects to /api/auth/callback\n- Callback checks if profile complete:\n  - If INCOMPLETE → redirect to /complete-profile page\n  - If COMPLETE → redirect to /dashboard\n\nNOTE: This must be opened in a real browser, not Postman, because it requires Google OAuth redirect flow.\n\nAfter successful login, proceed to 'Auth - Complete Profile' endpoint."
+      },
+      "response": []
+    },
+    {
+      "name": "Auth - Complete Profile (STEP 2 - REQUIRED)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "name", "value": "John Doe", "type": "text", "description": "Nama Lengkap (REQUIRED)" },
+            { "key": "gender", "value": "male", "type": "text", "description": "Gender: male/female/other (REQUIRED)" },
+            { "key": "date_of_birth", "value": "1995-06-15", "type": "text", "description": "Format: YYYY-MM-DD (REQUIRED, min age 13)" },
+            { "key": "file", "type": "file", "description": "Profile photo (JPEG/PNG/WebP, max 5MB) - OPTIONAL" }
+          ]
+        },
+        "url": { 
+          "raw": "{{baseUrl}}/api/auth/complete-profile", 
+          "host": ["{{baseUrl}}"], 
+          "path": ["api","auth","complete-profile"] 
+        },
+        "description": "🔥 NEW FLOW (Google OAuth):\n\nSTEP 2: Complete Profile After Google Login\n\nRequired fields:\n- name: Nama Lengkap\n- gender: male/female/other\n- date_of_birth: YYYY-MM-DD (must be 13+ years old)\n\nOptional:\n- file: Profile photo (max 5MB, JPEG/PNG/WebP)\n\nBackend flow:\n1. Verify user authenticated via Google OAuth\n2. Upload photo to Supabase Storage (if provided)\n3. Upsert user profile with complete data\n4. Return user object with photo_url\n\nResponse (200):\n{\n  \"message\": \"Profile completed successfully\",\n  \"user\": {\n    \"id\": \"uuid\",\n    \"email\": \"john@gmail.com\",\n    \"name\": \"John Doe\",\n    \"gender\": \"male\",\n    \"date_of_birth\": \"1995-06-15\",\n    \"photo_url\": \"https://...\"\n  }\n}\n\nNOTE: User must be authenticated (have valid session cookie from Google OAuth) before calling this endpoint."
+      },
+      "response": []
+    },
+    {
+      "name": "Auth - Check Profile Status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { 
+          "raw": "{{baseUrl}}/api/auth/complete-profile", 
+          "host": ["{{baseUrl}}"], 
+          "path": ["api","auth","complete-profile"] 
+        },
+        "description": "Check if user's profile is complete after Google OAuth login.\n\nResponse (profile incomplete):\n{\n  \"profile_completed\": false,\n  \"user\": {\n    \"id\": \"uuid\",\n    \"email\": \"user@gmail.com\",\n    \"name\": null,\n    \"gender\": null,\n    \"date_of_birth\": null,\n    \"photo_url\": null\n  }\n}\n\nResponse (profile complete):\n{\n  \"profile_completed\": true,\n  \"user\": {\n    \"id\": \"uuid\",\n    \"email\": \"user@gmail.com\",\n    \"name\": \"John Doe\",\n    \"gender\": \"male\",\n    \"date_of_birth\": \"1995-06-15\",\n    \"photo_url\": \"https://...\"\n  }\n}\n\nUse this to decide whether to show /complete-profile form or redirect to /dashboard."
+      },
+      "response": []
+    },
+    {
+      "name": "Auth - Register (DEPRECATED - use Google OAuth)",
       "request": {
         "method": "POST",
         "header": [
@@ -19,12 +70,12 @@
           "raw": "{\n  \"email\": \"testuser123@gmail.com\",\n  \"name\": \"Nama Pengguna\",\n  \"date_of_birth\": \"1990-01-15\",\n  \"photo_url\": \"https://example.com/photo.jpg\"\n}"
         },
         "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api","auth","register"] },
-        "description": "OLD: Register without file upload. For new implementation with photo upload, use 'Auth - Register with Photo Upload' endpoint instead."
+        "description": "⚠️ DEPRECATED: Use Google OAuth flow instead.\n\nOLD: Register without file upload. For new implementation, use:\n1. GET /api/auth/google-login (in browser)\n2. POST /api/auth/complete-profile (with form data)"
       },
       "response": []
     },
     {
-      "name": "Auth - Register with Photo Upload (RECOMMENDED)",
+      "name": "Auth - Register with Photo Upload (DEPRECATED)",
       "request": {
         "method": "POST",
         "header": [],
@@ -38,7 +89,7 @@
           ]
         },
         "url": { "raw": "{{baseUrl}}/api/auth/register-with-photo", "host": ["{{baseUrl}}"], "path": ["api","auth","register-with-photo"] },
-        "description": "RECOMMENDED: Sequential registration flow. Backend handles:\n1. Register user (create auth.users + users table)\n2. Upload photo if provided (automatic)\n3. Update users.photo_url\n\nReturns complete user profile with photo_url already populated. File upload is OPTIONAL - if not provided, user.photo_url will be null.\n\nResponse includes:\n- user.id, user.email, user.name, user.date_of_birth\n- user.photo_url (public URL if file uploaded)\n- session (auto-login)\n- steps_completed.registration & steps_completed.photo_upload"
+        "description": "⚠️ DEPRECATED: Use Google OAuth flow instead.\n\nOLD: Sequential registration flow with email/password. New flow uses Google OAuth + complete-profile."
       },
       "response": []
     },
