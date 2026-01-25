@@ -31,8 +31,9 @@ export default function Register() {
     setError,
   } = useForm<FormData>();
 
+  // menyesuaikan BE, format YYYY-MM-DD
   const formatDate = (date: Date) => {
-    return date.toISOString().split("T")[0]; // YYYY-MM-DD
+    return date.toISOString().split("T")[0];
   };  
 
   const onSubmit = async (data: FormData) => {
@@ -69,11 +70,19 @@ export default function Register() {
         throw new Error(text || "Gagal memulai tes");
       }      
 
+      const result = await res.json();
+      const newUserId = result.user.id;
+
+      if (!newUserId) {
+        throw new Error("User ID tidak ditemukan");
+      }      
+
       // UPLOAD FOTO
       const fd = new FormData();
       fd.append("file", data.photo[0]);
+      fd.append("userId", newUserId);
 
-      const uploadRes = await fetch("/api/user/upload-photo", {
+      const uploadRes = await fetch("/api/user/upload-photo-register", {
         method: "POST",
         body: fd,
       });
