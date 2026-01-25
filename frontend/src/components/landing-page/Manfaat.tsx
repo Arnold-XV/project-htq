@@ -1,4 +1,9 @@
+"use client";
+
 import Image from "next/image";
+import {motion as m} from "framer-motion";
+import { fadeUpSection } from "@/lib/motionVariants";
+import { sectionTitle } from "@/lib/motionVariants";
 
 const manfaat = [
   {
@@ -21,15 +26,25 @@ const manfaat = [
 export default function Manfaat() {
   return (
     <section className="px-6 md:px-16 py-16 bg-[var(--color-background)] text-[var(--foreground)]">
-      <h2 className="text-4xl text-center mb-10 font-cormorant font-extrabold autoshow">
+      <m.h2 variants={sectionTitle} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-4xl text-center mb-10 font-cormorant font-extrabold">
         Manfaat Tes
-      </h2>
+      </m.h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
         {manfaat.map((item, idx) => (
-          <div
+          <m.div
             key={idx}
-            className="border border-[var(--color-neutral-200)] rounded-xl p-6 text-center shadow-sm fadeup"
+            variants={fadeUpSection}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3, margin: "-100px" }}
+            whileHover={{ rotate: 2, y: -5, scale: 1.05 }}
+            transition={{
+            type: 'spring',
+            stiffness: 300,
+            damping: 15,
+      }}
+            className="border border-[var(--color-neutral-200)] rounded-xl p-6 text-center shadow-sm"
           >
             <Image 
               src={item.image} 
@@ -40,7 +55,7 @@ export default function Manfaat() {
             />
             <h3 className="font-plus-jakarta font-semibold md:font-bold text-lg mb-2">{item.title}</h3>
             <p className="font-plus-jakarta text-sm md:text-base text-[var(--foreground)] mb-4">{item.desc}</p>
-          </div>
+          </m.div>
         ))}
       </div>
     </section>
