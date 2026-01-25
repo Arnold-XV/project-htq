@@ -7,10 +7,10 @@ export async function GET(request: Request) {
   try {
     const { searchParams, origin } = new URL(request.url);
     const code = searchParams.get('code');
-    const next = searchParams.get('next') ?? '/complete-profile';
+    const next = searchParams.get('next') ?? '/register';
 
     if (!code) {
-      return NextResponse.redirect(`${origin}/login?error=no_code`);
+      return NextResponse.redirect(`${origin}/auth/login?error=no_code`);
     }
 
     const supabase = await createClient();
@@ -36,10 +36,10 @@ export async function GET(request: Request) {
       .eq('id', sessionData.user.id)
       .single();
 
-    // If user doesn't exist or profile incomplete, redirect to complete-profile
+    // If user doesn't exist or profile incomplete, redirect to register
     if (userError || !existingUser || !existingUser.name || !existingUser.gender || !existingUser.date_of_birth) {
-      console.log('🔵 New user or incomplete profile, redirecting to complete-profile');
-      return NextResponse.redirect(`${origin}/complete-profile`);
+      console.log('🔵 New user or incomplete profile, redirecting to register');
+      return NextResponse.redirect(`${origin}/register`);
     }
 
     // If profile is complete, redirect to dashboard or next page

@@ -10,7 +10,7 @@ function CallbackContent() {
   useEffect(() => {
     // Get the code from URL
     const code = searchParams.get('code');
-    const next = searchParams.get('next') || '/complete-profile';
+    const next = searchParams.get('next') || '/register';
 
     if (code) {
       // Forward to API route for proper handling
