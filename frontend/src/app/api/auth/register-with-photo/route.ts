@@ -139,11 +139,13 @@ export async function POST(request: Request) {
     if (file) {
       console.log('🔵 Step 2: Uploading photo...');
 
-      // Use anon client for storage upload
-      const anonSupabase = createAnonClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
+      // Use authenticated client if session exists, otherwise anon
+      const uploadClient = sessionData?.session 
+        ? supabase  // Authenticated (after auto-login)
+        : createAnonClient(  // Fallback to anon if auto-login failed
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+          );
 
       // Generate unique filename
       const fileExt = file.name.split('.').pop();
@@ -151,7 +153,7 @@ export async function POST(request: Request) {
       const filePath = `profile-photos/${fileName}`;
 
       // Upload to storage
-      const { error: uploadError } = await anonSupabase.storage
+      const { error: uploadError } = await uploadClient.storage
         .from('avatars')
         .upload(filePath, file, {
           cacheControl: '3600',
@@ -164,7 +166,7 @@ export async function POST(request: Request) {
         console.warn('⚠️ Photo upload failed, but user registration succeeded');
       } else {
         // Get public URL
-        const { data: { publicUrl } } = anonSupabase.storage
+        const { data: { publicUrl } } = uploadClient.storage
           .from('avatars')
           .getPublicUrl(filePath);
 
