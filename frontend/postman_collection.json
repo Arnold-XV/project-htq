@@ -19,7 +19,26 @@
           "raw": "{\n  \"email\": \"testuser123@gmail.com\",\n  \"name\": \"Nama Pengguna\",\n  \"date_of_birth\": \"1990-01-15\",\n  \"photo_url\": \"https://example.com/photo.jpg\"\n}"
         },
         "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api","auth","register"] },
-        "description": "Register new user without password. User fills: name, email, date_of_birth, photo_url (optional). System auto-generates password and logs user in automatically."
+        "description": "OLD: Register without file upload. For new implementation with photo upload, use 'Auth - Register with Photo Upload' endpoint instead."
+      },
+      "response": []
+    },
+    {
+      "name": "Auth - Register with Photo Upload (RECOMMENDED)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "email", "value": "testuser456@gmail.com", "type": "text", "description": "Valid email address" },
+            { "key": "name", "value": "Nama Pengguna", "type": "text", "description": "User's full name" },
+            { "key": "date_of_birth", "value": "1990-01-15", "type": "text", "description": "Format: YYYY-MM-DD" },
+            { "key": "file", "type": "file", "description": "Profile photo (JPEG/PNG/WebP, max 5MB) - OPTIONAL" }
+          ]
+        },
+        "url": { "raw": "{{baseUrl}}/api/auth/register-with-photo", "host": ["{{baseUrl}}"], "path": ["api","auth","register-with-photo"] },
+        "description": "RECOMMENDED: Sequential registration flow. Backend handles:\n1. Register user (create auth.users + users table)\n2. Upload photo if provided (automatic)\n3. Update users.photo_url\n\nReturns complete user profile with photo_url already populated. File upload is OPTIONAL - if not provided, user.photo_url will be null.\n\nResponse includes:\n- user.id, user.email, user.name, user.date_of_birth\n- user.photo_url (public URL if file uploaded)\n- session (auto-login)\n- steps_completed.registration & steps_completed.photo_upload"
       },
       "response": []
     },
@@ -100,7 +119,7 @@
       }
     },
     {
-      "name": "Quiz - Layer 3: Get Branch Questions (EHNH)",
+      "name": "Quiz - Layer 3: Get Questions (EHNH)",
       "request": {
         "method": "GET",
         "header": [],
@@ -110,10 +129,61 @@
           "path": ["api","quiz","questions"], 
           "query": [ 
             { "key": "layer", "value": "3", "description": "Layer 3: Branch questions" },
-            { "key": "branch", "value": "EHNH", "description": "Branch code (EHNH/EHNL/ELNH/ELNL)" }
+            { "key": "branch", "value": "EHNH", "description": "Ego High + Neuro High" }
           ] 
         },
-        "description": "NOTE: branch parameter might not be implemented yet in current schema. For now, Layer 3 returns all Juz selection questions regardless of branch. Check backend implementation."
+        "description": "REQUIRED for quiz flow. Fetch Layer 3 questions for EHNH branch (Ego High, Neuroticism High). Returns 5 questions. Branch parameter is REQUIRED - determined from Layer 2 results."
+      }
+    },
+    {
+      "name": "Quiz - Layer 3: Get Questions (EHNL)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { 
+          "raw": "{{baseUrl}}/api/quiz/questions?layer=3&branch=EHNL", 
+          "host": ["{{baseUrl}}"], 
+          "path": ["api","quiz","questions"], 
+          "query": [ 
+            { "key": "layer", "value": "3", "description": "Layer 3: Branch questions" },
+            { "key": "branch", "value": "EHNL", "description": "Ego High + Neuro Low" }
+          ] 
+        },
+        "description": "REQUIRED for quiz flow. Fetch Layer 3 questions for EHNL branch (Ego High, Neuroticism Low). Returns 5 questions. Branch parameter is REQUIRED - determined from Layer 2 results."
+      }
+    },
+    {
+      "name": "Quiz - Layer 3: Get Questions (ELNH)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { 
+          "raw": "{{baseUrl}}/api/quiz/questions?layer=3&branch=ELNH", 
+          "host": ["{{baseUrl}}"], 
+          "path": ["api","quiz","questions"], 
+          "query": [ 
+            { "key": "layer", "value": "3", "description": "Layer 3: Branch questions" },
+            { "key": "branch", "value": "ELNH", "description": "Ego Low + Neuro High" }
+          ] 
+        },
+        "description": "REQUIRED for quiz flow. Fetch Layer 3 questions for ELNH branch (Ego Low, Neuroticism High). Returns 5 questions. Branch parameter is REQUIRED - determined from Layer 2 results."
+      }
+    },
+    {
+      "name": "Quiz - Layer 3: Get Questions (ELNL)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { 
+          "raw": "{{baseUrl}}/api/quiz/questions?layer=3&branch=ELNL", 
+          "host": ["{{baseUrl}}"], 
+          "path": ["api","quiz","questions"], 
+          "query": [ 
+            { "key": "layer", "value": "3", "description": "Layer 3: Branch questions" },
+            { "key": "branch", "value": "ELNL", "description": "Ego Low + Neuro Low" }
+          ] 
+        },
+        "description": "REQUIRED for quiz flow. Fetch Layer 3 questions for ELNL branch (Ego Low, Neuroticism Low). Returns 5 questions. Branch parameter is REQUIRED - determined from Layer 2 results."
       }
     },
     {
