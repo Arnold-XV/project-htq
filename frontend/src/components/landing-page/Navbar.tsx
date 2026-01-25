@@ -1,11 +1,10 @@
 'use client';
 import { Globe, Menu, X } from "react-feather";
 import Image from "next/image";
-import { useRouter } from "next/dist/client/components/navigation";
 import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function Navbar() {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
 
 
@@ -28,7 +27,13 @@ export default function Navbar() {
             <div className="flex items-center gap-3 font-semibold">
               <button
                 className="rounded-lg bg-[var(--color-primary-button)] px-6 py-2 text-white hover:bg-[var(--color-primary-700)] shadow-sm cursor-pointer"
-                onClick={() => router.push("/register")}
+                onClick={async () => {await createClient().auth.signInWithOAuth({
+                  provider: "google",
+                  options: {
+                    redirectTo: `${location.origin}/auth/callback`,
+                  },
+                });
+                }}
               >
                 Mulai Test
               </button>
@@ -58,7 +63,13 @@ export default function Navbar() {
             </div>
             <button
               className="rounded-lg bg-[var(--color-primary-button)] px-6 py-2 text-white shadow-sm mb-3"
-              onClick={() => router.push("/register")}
+              onClick={async () => {await createClient().auth.signInWithOAuth({
+                provider: "google",
+                options: {
+                  redirectTo: `${location.origin}/auth/callback`,
+                },
+              });
+              }}
             >
               Mulai Test
             </button>
