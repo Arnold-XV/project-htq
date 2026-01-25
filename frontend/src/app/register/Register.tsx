@@ -31,10 +31,10 @@ export default function Register() {
     setError,
   } = useForm<FormData>();
 
-{/*  // menyesuaikan BE, format YYYY-MM-DD
+  // menyesuaikan BE, format YYYY-MM-DD
   const formatDate = (date: Date) => {
     return date.toISOString().split("T")[0];
-  };  */}
+  };
 
   const onSubmit = async (data: FormData) => {
     if (!agree) {
@@ -50,13 +50,14 @@ export default function Register() {
     setLoading(true);
 
     try {
-{/*      // ONBOARDING
+      // Complete profile after Google OAuth
       const fd = new FormData();
       fd.append("name", data.name);
-      fd.append("email", data.email);
+      fd.append("gender", "other"); // TODO: Add gender field to form
       fd.append("date_of_birth", formatDate(data.birthdate!));
       fd.append("file", data.photo[0]);
-      const res = await fetch("/api/auth/register-with-photo", {
+      
+      const res = await fetch("/api/auth/complete-profile", {
         method: "POST",
         body: fd,
       });
@@ -66,10 +67,10 @@ export default function Register() {
         console.error("STATUS:", res.status);
         console.error("RESPONSE:", text);
       
-        throw new Error(text || "Gagal memulai tes");
+        throw new Error(text || "Gagal menyimpan profil");
       }      
 
-      await res.json(); */}
+      await res.json();
 
       // MULAI TEST
       router.push("/test-page");
