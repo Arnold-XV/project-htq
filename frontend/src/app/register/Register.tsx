@@ -31,10 +31,10 @@ export default function Register() {
     setError,
   } = useForm<FormData>();
 
-  // menyesuaikan BE, format YYYY-MM-DD
+{/*  // menyesuaikan BE, format YYYY-MM-DD
   const formatDate = (date: Date) => {
     return date.toISOString().split("T")[0];
-  };  
+  };  */}
 
   const onSubmit = async (data: FormData) => {
     if (!agree) {
@@ -50,7 +50,7 @@ export default function Register() {
     setLoading(true);
 
     try {
-      // ONBOARDING
+{/*      // ONBOARDING
       const fd = new FormData();
       fd.append("name", data.name);
       fd.append("email", data.email);
@@ -69,7 +69,7 @@ export default function Register() {
         throw new Error(text || "Gagal memulai tes");
       }      
 
-      await res.json(); 
+      await res.json(); */}
 
       // MULAI TEST
       router.push("/test-page");
