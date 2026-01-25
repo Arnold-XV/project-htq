@@ -1,13 +1,17 @@
 'use client';
 import { useRouter } from "next/dist/client/components/navigation";
 import Image from "next/image";
+import { motion as m } from "framer-motion";
+import { ctaSection } from "@/lib/motionVariants";
 
 export default function CTA() {
   const router = useRouter();
  
   return (
-    <section className="px-6 md:px-16 py-20 bg-[var(--color-background)] text-[var(--foreground)] text-center font-plus-jakarta autoshow">
-      <div className="relative max-w-8xl mx-auto rounded-3xl overflow-hidden shadow-xl">
+    <section className="px-6 md:px-16 py-20 bg-[var(--color-background)] text-[var(--foreground)] text-center font-plus-jakarta">
+      <m.div variants={ctaSection} initial="hidden" whileInView="visible" viewport={{ once: true }}
+      whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+      className="relative max-w-8xl mx-auto rounded-3xl overflow-hidden shadow-xl">
         <Image
           src="/hero-bg.jpg"
           alt="Background"
@@ -17,7 +21,7 @@ export default function CTA() {
         <div className="absolute inset-0 bg-[var(--color-tosca)] opacity-60"></div>
 
         <div className="relative p-10 md:p-10 rounded-3xl">
-          <h2 className="text-2xl md:text-5xl font-cormorant font-extrabold max-w-2xl mx-auto">
+          <h2 className="text-[1.6rem] md:text-5xl font-cormorant font-extrabold max-w-2xl mx-auto">
             Sudah siap mengenal diri?
           </h2>
 
@@ -30,7 +34,7 @@ export default function CTA() {
             Mulai Test
           </button>
         </div>
-      </div>
+      </m.div>
     </section>
   );
 }

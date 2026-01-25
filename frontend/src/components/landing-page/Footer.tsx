@@ -31,7 +31,7 @@ export default function Footer() {
             <div>
               <h4 className="font-bold mb-4">Page</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="hover:underline text-[var(--foreground)]">Tentang Kami</a></li>
+                <li><a href="https://www.htqfoundation.com/" className="hover:underline text-[var(--foreground)]">Tentang Kami</a></li>
                 <li><a href="#" className="hover:underline text-[var(--foreground)]">Konsultasi</a></li>
               </ul>
             </div>
