@@ -33,7 +33,6 @@ export default function NavbarTestPage() {
         <Dialog>
           <DialogTrigger className="flex flex-row gap-2 items-center cursor-pointer hover:bg-neutral-100 px-4 rounded-[8px]">
             <Info className="w-5 h-5" />
-
             <p className="md:block hidden">Panduan</p>
           </DialogTrigger>
           <DialogContent className="bg-white !rounded-[15px] md:min-w-190 min-w-76 !ring-0 !shadow-none px-[25px] py-[23px]">

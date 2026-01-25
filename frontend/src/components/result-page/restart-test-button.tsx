@@ -2,11 +2,9 @@
 
 import React from "react";
 import { Button } from "../ui/button";
-import { useRouter } from "next/navigation";
 import { RefreshCcw } from "lucide-react";
 
 export default function RestartTest() {
-  const router = useRouter();
   function handleClick() {
     try {
       localStorage.removeItem("lastResultPayload");
@@ -17,15 +15,12 @@ export default function RestartTest() {
       localStorage.removeItem("lastTieBreakerQuestions");
       localStorage.removeItem("lastTieBreakerParams");
     } catch {}
-    router.push("/test/1");
-    if (typeof window !== "undefined") {
-      window.location.reload();
-    }
+    window.location.href = "/test/1";
   }
   return (
     <Button
       onClick={handleClick}
-      className="shadow-xs bg-neutral-100 text-neutral-900 font-bold text-[14px] !px-3.5 py-2"
+      className="shadow-xs bg-neutral-100 text-neutral-900 font-bold text-[14px] !px-3.5 py-2 hover:scale-105 rounded-[8px]"
     >
       <RefreshCcw />
       <p>Ulangi Test</p>

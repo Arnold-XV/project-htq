@@ -337,7 +337,6 @@ export default function TestPage() {
             "lastResultPayload",
             JSON.stringify(payloadToStore),
           );
-          console.log("Saved lastResultPayload", payloadToStore);
         } catch {}
         if (idToShow) {
           router.push(`/result?id=${encodeURIComponent(idToShow)}`);

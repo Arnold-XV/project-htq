@@ -36,20 +36,24 @@ export default function HasilJuz({ result }: { result?: any }) {
       : null;
 
   const percentForLevel = (level: string | null) =>
-    level === "HIGH" ? 100 : level === "LOW" ? 0 : 0;
+    level === "HIGH" ? 90 : level === "LOW" ? 10 : 0;
 
-  const scoresArr: { label: string; percent: number }[] = [
-    { label: "EGO", percent: percentForLevel(egoLevel) },
-    { label: "NEO", percent: percentForLevel(neoLevel) },
-  ];
+  const scoresArr: { label: string; percent: number; level: string | null }[] =
+    [
+      { label: "EGO", percent: percentForLevel(egoLevel), level: egoLevel },
+      { label: "NEO", percent: percentForLevel(neoLevel), level: neoLevel },
+    ];
 
   return (
-    <div className="flex flex-col gap-7 mt-4.5">
+    <div id="hasil-juz-root" className="flex flex-col gap-7 mt-4.5">
       <div className="shadow-sm">
         <div
-          className="relative bg-neutral-50 text-neutral-25 rounded-[10px] bg-no-repeat lg:bg-[length:100.94%_376.958%]  lg:bg-[-6px_-13px] bg-[length:100%_auto] bg-[0px_0px] 
-            md:bg-[length:100%_250%] md:bg-[0px_-10px] bg-center before:absolute before:inset-0 before:bg-[rgba(61,159,142,0.20)] before:rounded-[10px] px-6 pt-10 pb-2 xxs:pt-20 xxs:pb-6 xs:px-6 xs:pt-40 xs:pb-6 md:px-40 md:py-8 lg:px-50 lg:py-12 xl:pt-17 xl:pb-16 xl:pl-81.5 xl:pr-99"
-          style={{ backgroundImage: "url(/image/juz-result-bg.webp)" }}
+          className="relative bg-neutral-50 text-neutral-25 rounded-[10px] bg-no-repeat lg:bg-[length:100.94%_376.958%]  lg:bg-[-6px_-13px] bg-[length:100%_auto] bg-[0px_0px] bg-opa 
+            md:bg-[length:100%_250%] md:bg-[0px_-10px] bg-center before:absolute before:inset-0 before:bg-[rgba(61,159,142,0.20)] before:rounded-[10px] px-4 py-2 xxs:pt-6 xxs:pb-6 xs:px-6 xs:pt-20 xs:pb-2 md:px-40 md:py-8 lg:px-50 lg:py-12 xl:pt-17 xl:pb-16 xl:pl-81.5 xl:pr-99"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(0,0,0,0.20), rgba(0,0,0,0.10)), url(/image/juz-result-bg.webp)",
+          }}
         >
           <h4 className="font-bold lg:text-[38px] text-[26px] z-1">
             Juz {juz} - {name}
@@ -94,12 +98,15 @@ export default function HasilJuz({ result }: { result?: any }) {
           </p>
           <div className="w-full flex flex-col gap-2 mt-2">
             {scoresArr.map(
-              (s: { label: string; percent: number }, i: number) => (
+              (
+                s: { label: string; percent: number; level: string | null },
+                i: number,
+              ) => (
                 <div key={i} className="flex flex-col gap-2">
                   <div className="flex flex-row justify-between items-center">
                     <p className="lg:text-[18px] text-[14px]">{s.label}</p>
                     <p className="bg-[#E6F6F4] px-2.5 py-[5px] text-[#007F6D] font-semibold rounded-[5px] lg:text-[16px] text-[12px]">
-                      {s.percent}%
+                      {s.level}
                     </p>
                   </div>
                   <div className="bg-neutral-200 rounded-[20px]">
