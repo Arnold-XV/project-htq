@@ -51,15 +51,14 @@ export default function Register() {
 
     try {
       // ONBOARDING
-      const res = await fetch("/api/auth/register", {
+      const fd = new FormData();
+      fd.append("name", data.name);
+      fd.append("email", data.email);
+      fd.append("date_of_birth", formatDate(data.birthdate!));
+      fd.append("file", data.photo[0]);
+      const res = await fetch("/api/auth/register-with-photo", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: data.name,
-          email: data.email,
-          date_of_birth: formatDate(data.birthdate!),
-          photo_url: null,
-        }),
+        body: fd,
       });
 
       if (!res.ok) {
@@ -70,26 +69,7 @@ export default function Register() {
         throw new Error(text || "Gagal memulai tes");
       }      
 
-      const result = await res.json();
-      const newUserId = result.user.id;
-
-      if (!newUserId) {
-        throw new Error("User ID tidak ditemukan");
-      }      
-
-      // UPLOAD FOTO
-      const fd = new FormData();
-      fd.append("file", data.photo[0]);
-      fd.append("userId", newUserId);
-
-      const uploadRes = await fetch("/api/user/upload-photo-register", {
-        method: "POST",
-        body: fd,
-      });
-
-      if (!uploadRes.ok) {
-        throw new Error("Upload foto gagal");
-      }
+      await res.json(); 
 
       // MULAI TEST
       router.push("/test-page");
