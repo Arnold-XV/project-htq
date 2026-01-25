@@ -1,11 +1,11 @@
 'use client';
-import { useRouter } from "next/dist/client/components/navigation";
+
 import Image from "next/image";
 import { motion as m } from "framer-motion";
 import { ctaSection } from "@/lib/motionVariants";
+import { createClient } from "@/lib/supabase/client";
 
 export default function CTA() {
-  const router = useRouter();
  
   return (
     <section className="px-6 md:px-16 py-20 bg-[var(--color-background)] text-[var(--foreground)] text-center font-plus-jakarta">
@@ -30,7 +30,13 @@ export default function CTA() {
           </p>
 
           <button className="mt-8 bg-[var(--foreground)] text-white px-13 py-2.5 rounded-lg cursor-pointer hover:bg-[var(--color-primary-700)] shadow-lg text-sm"
-          onClick={() => router.push("/auth/login")}>
+          onClick={async () => {await createClient().auth.signInWithOAuth({
+            provider: "google",
+            options: {
+              redirectTo: `${location.origin}/auth/callback`,
+            },
+          });
+          }}>
             Mulai Test
           </button>
         </div>
