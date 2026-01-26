@@ -51,16 +51,17 @@ export async function GET(request: Request) {
     // ============================================
     const { data: quizResults, error: quizError } = await supabase
       .from('quiz_results')
-      .select('id, personality_type, completed_at')
+      .select('id, final_juz, completed_at')
       .eq('user_id', sessionData.user.id)
+      .not('completed_at', 'is', null) // Only get completed quizzes
       .order('completed_at', { ascending: false })
       .limit(1);
 
-    // If quiz completed, redirect to results
+    // If quiz completed, redirect to results (use query param format)
     if (!quizError && quizResults && quizResults.length > 0) {
       const latestResult = quizResults[0];
-      console.log('✅ Quiz already completed → /result/' + latestResult.id);
-      return NextResponse.redirect(`${origin}/result/${latestResult.id}`);
+      console.log('✅ Quiz already completed → /result?id=' + latestResult.id);
+      return NextResponse.redirect(`${origin}/result?id=${latestResult.id}`);
     }
 
     // If profile complete but quiz not done, redirect to test
