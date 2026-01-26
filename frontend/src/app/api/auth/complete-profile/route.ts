@@ -129,20 +129,29 @@ export async function POST(request: Request) {
     // STEP 3: UPSERT USER PROFILE
     // ============================================
     console.log('🔵 Step 3: Saving profile to database...');
+    console.log('🔍 User ID from auth:', user.id);
+    console.log('🔍 User email from auth:', user.email);
 
+    // First check if row exists
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id, email')
+      .eq('id', user.id)
+      .single();
+
+    console.log('🔍 Existing user in DB:', existingUser);
+
+    // Use UPDATE instead of UPSERT to avoid INSERT policy conflict
     const { data: userData, error: upsertError } = await supabase
       .from('users')
-      .upsert({
-        id: user.id,
-        email: user.email!,
+      .update({
         name,
         gender,
         date_of_birth,
         photo_url,
         updated_at: new Date().toISOString(),
-      }, {
-        onConflict: 'id',
       })
+      .eq('id', user.id)
       .select()
       .single();
 

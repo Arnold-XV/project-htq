@@ -7,10 +7,10 @@ export async function GET(request: Request) {
   try {
     const { searchParams, origin } = new URL(request.url);
     const code = searchParams.get('code');
-    const next = searchParams.get('next') ?? '/complete-profile';
+    const next = searchParams.get('next') ?? '/register';
 
     if (!code) {
-      return NextResponse.redirect(`${origin}/login?error=no_code`);
+      return NextResponse.redirect(`${origin}/auth/login?error=no_code`);
     }
 
     const supabase = await createClient();
@@ -29,22 +29,44 @@ export async function GET(request: Request) {
 
     console.log('✅ Google OAuth successful for user:', sessionData.user.id);
 
-    // Check if user profile exists in our users table
+    // ============================================
+    // STEP 1: Check if user profile exists
+    // ============================================
     const { data: existingUser, error: userError } = await supabase
       .from('users')
       .select('id, name, gender, date_of_birth, photo_url')
       .eq('id', sessionData.user.id)
       .single();
 
-    // If user doesn't exist or profile incomplete, redirect to complete-profile
+    // If user doesn't exist or profile incomplete, redirect to register
     if (userError || !existingUser || !existingUser.name || !existingUser.gender || !existingUser.date_of_birth) {
-      console.log('🔵 New user or incomplete profile, redirecting to complete-profile');
-      return NextResponse.redirect(`${origin}/complete-profile`);
+      console.log('🔵 New user or incomplete profile → /register');
+      return NextResponse.redirect(`${origin}/register`);
     }
 
-    // If profile is complete, redirect to dashboard or next page
-    console.log('✅ Profile complete, redirecting to:', next);
-    return NextResponse.redirect(`${origin}${next}`);
+    console.log('✅ Profile complete');
+
+    // ============================================
+    // STEP 2: Check if user has completed quiz
+    // ============================================
+    const { data: quizResults, error: quizError } = await supabase
+      .from('quiz_results')
+      .select('id, final_juz, completed_at')
+      .eq('user_id', sessionData.user.id)
+      .not('completed_at', 'is', null) // Only get completed quizzes
+      .order('completed_at', { ascending: false })
+      .limit(1);
+
+    // If quiz completed, redirect to results (use query param format)
+    if (!quizError && quizResults && quizResults.length > 0) {
+      const latestResult = quizResults[0];
+      console.log('✅ Quiz already completed → /result?id=' + latestResult.id);
+      return NextResponse.redirect(`${origin}/result?id=${latestResult.id}`);
+    }
+
+    // If profile complete but quiz not done, redirect to test
+    console.log('🔵 Profile complete but quiz not done → /test/1');
+    return NextResponse.redirect(`${origin}/test/1`);
     
   } catch (error: any) {
     console.error('❌ Callback error:', error);

@@ -4,7 +4,7 @@
  * Combine class names conditionally
  */
 export function cn(...classes: (string | undefined | null | false)[]): string {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
 
 /**
@@ -12,10 +12,10 @@ export function cn(...classes: (string | undefined | null | false)[]): string {
  */
 export function formatDate(date: string | Date): string {
   const d = new Date(date);
-  return d.toLocaleDateString('id-ID', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  return d.toLocaleDateString("id-ID", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 }
 
@@ -40,7 +40,7 @@ export function calculatePersonalityType(answers: Record<string, string>): {
     .slice(0, 4)
     .map(([trait]) => trait);
 
-  const personalityType = sortedTraits.join('');
+  const personalityType = sortedTraits.join("");
 
   // Map personality type to Juz (example mapping)
   const juzMapping: Record<string, number> = {
@@ -64,7 +64,7 @@ export function handleApiError(error: unknown): {
   error: string;
   status: number;
 } {
-  console.error('API Error:', error);
+  console.error("API Error:", error);
 
   if (error instanceof Error) {
     return {
@@ -74,7 +74,7 @@ export function handleApiError(error: unknown): {
   }
 
   return {
-    error: 'An unexpected error occurred',
+    error: "An unexpected error occurred",
     status: 500,
   };
 }
@@ -95,22 +95,25 @@ export function isValidPassword(password: string): {
   message?: string;
 } {
   if (password.length < 8) {
-    return { valid: false, message: 'Password must be at least 8 characters' };
+    return { valid: false, message: "Password must be at least 8 characters" };
   }
   if (!/[A-Z]/.test(password)) {
     return {
       valid: false,
-      message: 'Password must contain at least one uppercase letter',
+      message: "Password must contain at least one uppercase letter",
     };
   }
   if (!/[a-z]/.test(password)) {
     return {
       valid: false,
-      message: 'Password must contain at least one lowercase letter',
+      message: "Password must contain at least one lowercase letter",
     };
   }
   if (!/[0-9]/.test(password)) {
-    return { valid: false, message: 'Password must contain at least one number' };
+    return {
+      valid: false,
+      message: "Password must contain at least one number",
+    };
   }
 
   return { valid: true };

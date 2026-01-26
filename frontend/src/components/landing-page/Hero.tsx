@@ -23,7 +23,7 @@ export default function Hero() {
       <div className="absolute inset-0 bg-[var(--color-tosca)] opacity-60"></div>
 
       {/* Konten */}
-      <div className="relative z-10 text-[var(--foreground)] mt-55 md:mt-30">
+      <div className="relative z-10 text-[var(--foreground)] mt-35 md:mt-20">
         <m.span variants={heroBadge} className="font-semibold inline-block 
                  bg-[var(--color-background-2)]/60 text-sm px-5 py-1 rounded-xl
                  shadow-[0_1px_10px_rgba(190,237,208,0.5),0_1px_35px_rgba(190,237,208,0.5)]

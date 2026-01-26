@@ -9,13 +9,19 @@ export async function GET(request: Request) {
     
     // Get the origin from request headers
     const { searchParams, origin } = new URL(request.url);
-    const next = searchParams.get('next') ?? '/complete-profile';
+    const next = searchParams.get('next') ?? '/register';
+
+    // Use environment variable for callback URL (or fallback to origin)
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || origin;
+    const callbackUrl = `${baseUrl}/api/auth/callback?next=${next}`;
+    
+    console.log('🔵 Initiating OAuth with redirectTo:', callbackUrl);
 
     // Initiate Google OAuth sign in
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${origin}/api/auth/callback?next=${next}`,
+        redirectTo: callbackUrl,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
