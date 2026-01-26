@@ -56,7 +56,7 @@ export default function Footer() {
         {/* BOTTOM */}
         <div className="flex flex-col md:flex-row items-center justify-between pt-8 font-plus-jakarta text-[var(--foreground)]">
           <p className="text-base">
-            <span className="text-base font-light align-middle relative -top-0.5 mr-1.5">©</span> 2025 Copyright - OmahTI
+            <span className="text-base font-light align-middle relative -top-0.5 mr-1.5">©</span> 2026 HTQ Foundation — Built by OmahTI
           </p>
           <div className="flex items-center gap-5 mt-2 md:mt-0">
             <a
