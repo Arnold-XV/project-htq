@@ -190,6 +190,64 @@ export default function TestPage() {
     };
   }, [router, page, branchCategory]);
 
+  useEffect(() => {
+    if (page !== 1) return;
+    if (typeof window === "undefined") return;
+
+    const urlSp = new URL(window.location.href).searchParams;
+    const isFreshQuery = urlSp.get("fresh") === "1";
+    const shouldClear =
+      isFreshQuery || localStorage.getItem("clearQuizOnStart") === "1";
+
+    if (!shouldClear) return;
+
+    const keysToClear = [
+      "quizResultId",
+      "lastTieBreakerQuestions",
+      "lastTieBreakerParams",
+      "lastResultPayload",
+      "branchCategory",
+      "answers",
+      "quizAnswers",
+    ];
+
+    keysToClear.forEach((k) => {
+      try {
+        localStorage.removeItem(k);
+      } catch {}
+    });
+    try {
+      localStorage.removeItem("clearQuizOnStart");
+    } catch {}
+
+    try {
+      if (typeof setAnswers === "function") {
+        if ((setAnswers as any).length === 1) {
+          (setAnswers as any)({});
+        } else if (answers && typeof answers === "object") {
+          Object.keys(answers).forEach((k) => {
+            try {
+              (setAnswers as any)(Number(k), "");
+            } catch {}
+          });
+        }
+      }
+    } catch {}
+
+    if (!isFreshQuery) {
+      const nextUrl =
+        window.location.pathname +
+        (window.location.search
+          ? window.location.search + "&fresh=1"
+          : "?fresh=1");
+      window.location.replace(nextUrl);
+      return;
+    } else {
+      const cleanUrl = window.location.pathname + window.location.hash;
+      window.history.replaceState(null, "", cleanUrl);
+    }
+  }, [page, setAnswers, answers]);
+
   const pageQs = questions.slice(start, questions.length);
   const setAnswer = (qKey: string | number, value: string) =>
     setAnswers(qKey as number, value);
