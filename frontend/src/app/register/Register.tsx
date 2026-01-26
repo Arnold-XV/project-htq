@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Calendar, ChevronLeft, Mail, Upload, User } from "react-feather";
+import { Calendar, ChevronLeft, Upload, User, Users } from "react-feather";
 import { useForm, Controller } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -11,7 +11,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 type FormData = {
   name: string;
-  email: string;
+  gender: string;
   birthdate: Date | null;
   photo: FileList;
 };
@@ -136,7 +136,7 @@ export default function Register() {
             )}
           </div>
 
-          {/* Email */}
+        {/* Email
           <div className="relative">
             <label className="text-sm font-bold">Alamat Email</label>
             <input
@@ -157,6 +157,25 @@ export default function Register() {
               <p className="text-red-500 text-xs mt-1">
                 {errors.email.message}
               </p>
+            )}
+          </div> */}
+
+          {/* Jenis Kelamin */}
+          <div className="relative">
+            <label className="text-sm font-bold">Jenis Kelamin</label>
+            <select
+              id="gender"
+              {...register("gender", { required: "Jenis kelamin wajib dipilih" })}
+              className="appearance-none mt-1 w-full rounded-md border border-[var(--color-neutral-300)] px-9 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-300)] text-[var(--color-neutral-400)]"
+              defaultValue="" // biar placeholder muncul
+            >
+              <option value="" disabled hidden >Laki-laki/Perempuan</option>
+              <option value="male">Laki-laki</option>
+              <option value="female">Perempuan</option>
+            </select>
+            <Users className="absolute left-3 top-10 h-4 w-4 text-[var(--color-neutral-600)]"></Users>
+            {errors.gender && (
+              <p className="text-red-500 text-xs mt-1">{errors.gender.message}</p>
             )}
           </div>
 
@@ -179,7 +198,7 @@ export default function Register() {
                     dropdownMode="select"
                     dateFormat="MM/dd/yyyy"
                     wrapperClassName="w-full"
-                    className="mt-1 w-full rounded-lg border border-[var(--color-neutral-300)] pl-9 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-300)] text-[var(--color-neutral-500)]"
+                    className="mt-1 w-full rounded-lg border border-[var(--color-neutral-300)] pl-9 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-300)] placeholder-[var(--color-neutral-400)]"
                   />{" "}
                 </div>
               )}
@@ -200,7 +219,7 @@ export default function Register() {
             <label
               htmlFor="photo"
               className="mt-1 flex items-center gap-2 rounded-lg pl-9 py-2 px-3 text-sm
-                text-[var(--color-neutral-500)] cursor-pointer hover:bg-[var(--color-neutral-100)]
+                text-[var(--color-neutral-400)] cursor-pointer hover:bg-[var(--color-neutral-100)]
                 relative
               "
               style={{
