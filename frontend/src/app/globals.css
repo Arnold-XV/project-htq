@@ -108,6 +108,7 @@
 :root {
   --foreground: #000;
   --background: #fff;
+  --radius: 8px;
 }
 
 body {
