@@ -53,7 +53,7 @@ export default function Register() {
       // Complete profile after Google OAuth
       const fd = new FormData();
       fd.append("name", data.name);
-      fd.append("gender", "other"); // TODO: Add gender field to form
+      fd.append("gender", data.gender); // Use form value: "male" or "female"
       fd.append("date_of_birth", formatDate(data.birthdate!));
       fd.append("file", data.photo[0]);
 
