@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
+import { QuestionsProvider } from "../components/test-page/questions-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -33,7 +35,8 @@ export default function RootLayout({
       <body
         className={`${plusJakarta.variable} ${cormorant.variable} antialiased`}
       >
-        {children}
+        <Toaster />
+        <QuestionsProvider>{children}</QuestionsProvider>
       </body>
     </html>
   );

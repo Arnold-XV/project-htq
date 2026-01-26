@@ -56,7 +56,7 @@ export default function Register() {
       fd.append("gender", "other"); // TODO: Add gender field to form
       fd.append("date_of_birth", formatDate(data.birthdate!));
       fd.append("file", data.photo[0]);
-      
+
       const res = await fetch("/api/auth/complete-profile", {
         method: "POST",
         body: fd,
@@ -66,55 +66,58 @@ export default function Register() {
         const text = await res.text();
         console.error("STATUS:", res.status);
         console.error("RESPONSE:", text);
-      
+
         throw new Error(text || "Gagal menyimpan profil");
-      }      
+      }
 
       await res.json();
 
+      // mark quiz to be cleared on next /test/1 load
+      try {
+        localStorage.setItem("clearQuizOnStart", "1");
+      } catch {}
+
       // MULAI TEST
-      router.push("/test-page");
+      router.push("/test/1");
     } catch (err: unknown) {
       console.error(err);
-    
+
       const message =
-        err instanceof Error
-          ? err.message
-          : "Terjadi kesalahan, coba lagi";
-    
+        err instanceof Error ? err.message : "Terjadi kesalahan, coba lagi";
+
       setError("root", { message });
     } finally {
       setLoading(false);
     }
-    
   };
 
   return (
     <section className="h-screen bg-[var(--color-neutral-50)] items-center justify-center px-4 py-12 text-[var(--foreground)] relative flex flex-col">
       <button
-      onClick={() => router.push("/")}
-      className="cursor-pointer shadow-md absolute top-8 left-5 md:left-7 text-sm font-bold bg-[var(--background)] px-3 py-1.5 rounded-md border border-[var(--color-neutral-300)] hover:bg-blue-800 flex">
-      <ChevronLeft className="h-5 w-5 mr-1.5" size={20}/>
-      Kembali</button>
-      
-        {/* Logo & Title */}
-        <div className="text-center mb-6">
-          <Image
-            src="/htq-logo.png"
-            alt="HTQ"
-            width={60}
-            height={60}
-            className="mx-auto mb-2"
-          />
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--color-tosca)] to-[var(--color-success-900)] bg-clip-text text-transparent">
-            Langkah awal untuk melanjutkan
-          </h1>
-          <p className="text-sm text-[var(--foreground)] font-medium mt-1">
-            Kami hanya butuh sedikit info sebelum kamu mulai.
-          </p>
-        </div>
-      <div className="w-full max-w-md bg-white rounded-lg shadow-md border border-[var(--color-neutral-200)] p-6 md:p-8">
+        onClick={() => router.push("/")}
+        className="cursor-pointer shadow-md absolute top-8 left-5 md:left-7 text-sm font-bold bg-[var(--background)] px-3 py-1.5 rounded-md border border-[var(--color-neutral-300)] hover:bg-blue-800 flex"
+      >
+        <ChevronLeft className="h-5 w-5 mr-1.5" size={20} />
+        Kembali
+      </button>
 
+      {/* Logo & Title */}
+      <div className="text-center mb-6">
+        <Image
+          src="/htq-logo.png"
+          alt="HTQ"
+          width={60}
+          height={60}
+          className="mx-auto mb-2"
+        />
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--color-tosca)] to-[var(--color-success-900)] bg-clip-text text-transparent">
+          Langkah awal untuk melanjutkan
+        </h1>
+        <p className="text-sm text-[var(--foreground)] font-medium mt-1">
+          Kami hanya butuh sedikit info sebelum kamu mulai.
+        </p>
+      </div>
+      <div className="w-full max-w-md bg-white rounded-lg shadow-md border border-[var(--color-neutral-200)] p-6 md:p-8">
         {/* Form */}
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           {/* Nama */}
@@ -128,7 +131,9 @@ export default function Register() {
               className="mt-1 w-full rounded-md border border-[var(--color-neutral-300)] px-9 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-300)]"
             />
             <User className="absolute left-3 top-10 h-4 w-4 text-[var(--color-neutral-600)]"></User>
-              {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+            )}
           </div>
 
           {/* Email */}
@@ -138,16 +143,21 @@ export default function Register() {
               type="email"
               id="email"
               placeholder="fatimah@badr.co.id"
-              {...register("email", { required: "Email wajib diisi",
+              {...register("email", {
+                required: "Email wajib diisi",
                 pattern: {
                   value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Format email tidak valid"
+                  message: "Format email tidak valid",
                 },
-               })}
+              })}
               className="mt-1 w-full rounded-lg border border-[var(--color-neutral-300)] px-9 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-500)]"
             />
             <Mail className="absolute left-3 top-10 h-4 w-4 text-[var(--color-neutral-600)]"></Mail>
-              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.email.message}
+              </p>
+            )}
           </div>
 
           {/* Tanggal Lahir */}
@@ -161,16 +171,17 @@ export default function Register() {
               render={({ field }) => (
                 <div className="w-full">
                   <DatePicker
-                  placeholderText="MM/DD/YYYY"
-                  selected={field.value}
-                  onChange={field.onChange}
-                  showMonthDropdown
-                  showYearDropdown
-                  dropdownMode="select"
-                  dateFormat="MM/dd/yyyy"
-                  wrapperClassName="w-full"
-                  className="mt-1 w-full rounded-lg border border-[var(--color-neutral-300)] pl-9 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-300)] text-[var(--color-neutral-500)]"
-                /> </div>
+                    placeholderText="MM/DD/YYYY"
+                    selected={field.value}
+                    onChange={field.onChange}
+                    showMonthDropdown
+                    showYearDropdown
+                    dropdownMode="select"
+                    dateFormat="MM/dd/yyyy"
+                    wrapperClassName="w-full"
+                    className="mt-1 w-full rounded-lg border border-[var(--color-neutral-300)] pl-9 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-300)] text-[var(--color-neutral-500)]"
+                  />{" "}
+                </div>
               )}
             />
 
@@ -207,22 +218,30 @@ export default function Register() {
               id="photo"
               type="file"
               accept="image/*"
-              {...register("photo", { required: "Foto wajib diupload",
-              onChange: (e) => {const file = e.target.files?.[0];
-                if (file) {
-                  setPhoto(file);
-                }
-              },
-             })}
+              {...register("photo", {
+                required: "Foto wajib diupload",
+                onChange: (e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setPhoto(file);
+                  }
+                },
+              })}
               className="hidden"
             />
             <p className="text-xs font-medium text-[var(--color-neutral-400)] mt-1">
-              Foto hanya digunakan sebagai bagian dari proses refleksi diri dan tidak dipublikasikan atau dibagikan ke pihak mana pun.</p>
-            {errors.photo && <p className="text-red-500 text-xs mt-1">{errors.photo.message}</p>}
+              Foto hanya digunakan sebagai bagian dari proses refleksi diri dan
+              tidak dipublikasikan atau dibagikan ke pihak mana pun.
+            </p>
+            {errors.photo && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.photo.message}
+              </p>
+            )}
           </div>
 
-         {/* Syarat & Ketentuan */}
-         <div className="flex items-start gap-3 text-xs text-[var(--foreground)]">
+          {/* Syarat & Ketentuan */}
+          <div className="flex items-start gap-3 text-xs text-[var(--foreground)]">
             <input
               type="checkbox"
               checked={agree}
@@ -249,20 +268,26 @@ export default function Register() {
             </p>
           </div>
 
-          {errors.root && <p className="text-red-500 text-xs mt-1">{errors.root.message}</p>}
+          {errors.root && (
+            <p className="text-red-500 text-xs mt-1">{errors.root.message}</p>
+          )}
 
           {showPrivacy && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
               <div className="bg-white rounded-xl max-w-[26rem] w-full p-6">
-                <h2 className="text-lg font-bold mb-3 text-center">Kebijakan Privasi</h2>
+                <h2 className="text-lg font-bold mb-3 text-center">
+                  Kebijakan Privasi
+                </h2>
 
                 <div className="text-xs text-[var(--foreground)] max-h-60 overflow-y-auto text-justify">
                   <p>
-                    Website ini mengumpulkan data berupa nama, email, foto profil,
-                    serta jawaban tes kepribadian untuk keperluan pelaksanaan tes,
-                    penampilan dan penyimpanan hasil, serta pemberian rekomendasi yang relevan.
-                    Seluruh data disimpan dengan <span className="font-bold">aman</span>, bersifat 
-                    pribadi, dan <span className="font-bold">tidak dibagikan </span> 
+                    Website ini mengumpulkan data berupa nama, email, foto
+                    profil, serta jawaban tes kepribadian untuk keperluan
+                    pelaksanaan tes, penampilan dan penyimpanan hasil, serta
+                    pemberian rekomendasi yang relevan. Seluruh data disimpan
+                    dengan <span className="font-bold">aman</span>, bersifat
+                    pribadi, dan{" "}
+                    <span className="font-bold">tidak dibagikan </span>
                     kepada pihak ketiga lain di luar keperluan layanan ini.
                   </p>
                 </div>
@@ -285,7 +310,6 @@ export default function Register() {
             {loading ? "Loading..." : "Mulai Tes"}
           </button>
         </form>
-
       </div>
     </section>
   );
