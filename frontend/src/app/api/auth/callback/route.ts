@@ -65,8 +65,8 @@ export async function GET(request: Request) {
     }
 
     // If profile complete but quiz not done, redirect to test
-    console.log('🔵 Profile complete but quiz not done → /test-page');
-    return NextResponse.redirect(`${origin}/test-page`);
+    console.log('🔵 Profile complete but quiz not done → /test/1');
+    return NextResponse.redirect(`${origin}/test/1`);
     
   } catch (error: any) {
     console.error('❌ Callback error:', error);
