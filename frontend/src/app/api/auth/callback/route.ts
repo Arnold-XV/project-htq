@@ -29,7 +29,9 @@ export async function GET(request: Request) {
 
     console.log('✅ Google OAuth successful for user:', sessionData.user.id);
 
-    // Check if user profile exists in our users table
+    // ============================================
+    // STEP 1: Check if user profile exists
+    // ============================================
     const { data: existingUser, error: userError } = await supabase
       .from('users')
       .select('id, name, gender, date_of_birth, photo_url')
@@ -38,13 +40,32 @@ export async function GET(request: Request) {
 
     // If user doesn't exist or profile incomplete, redirect to register
     if (userError || !existingUser || !existingUser.name || !existingUser.gender || !existingUser.date_of_birth) {
-      console.log('🔵 New user or incomplete profile, redirecting to register');
+      console.log('🔵 New user or incomplete profile → /register');
       return NextResponse.redirect(`${origin}/register`);
     }
 
-    // If profile is complete, redirect to dashboard or next page
-    console.log('✅ Profile complete, redirecting to:', next);
-    return NextResponse.redirect(`${origin}${next}`);
+    console.log('✅ Profile complete');
+
+    // ============================================
+    // STEP 2: Check if user has completed quiz
+    // ============================================
+    const { data: quizResults, error: quizError } = await supabase
+      .from('quiz_results')
+      .select('id, personality_type, completed_at')
+      .eq('user_id', sessionData.user.id)
+      .order('completed_at', { ascending: false })
+      .limit(1);
+
+    // If quiz completed, redirect to results
+    if (!quizError && quizResults && quizResults.length > 0) {
+      const latestResult = quizResults[0];
+      console.log('✅ Quiz already completed → /result/' + latestResult.id);
+      return NextResponse.redirect(`${origin}/result/${latestResult.id}`);
+    }
+
+    // If profile complete but quiz not done, redirect to test
+    console.log('🔵 Profile complete but quiz not done → /test-page');
+    return NextResponse.redirect(`${origin}/test-page`);
     
   } catch (error: any) {
     console.error('❌ Callback error:', error);
