@@ -22,7 +22,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // Redirect to dashboard if accessing auth pages while logged in
-  const authPaths = ['/login', '/register'];
+  // Note: /register is excluded because it's used for completing Google OAuth profile
+  const authPaths = ['/login', '/auth/login'];
   const isAuthPath = authPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   );
