@@ -363,6 +363,14 @@ async function fetchPersonality(supabase: any, juzNumber: number) {
     challenges: data.challenges,
     development_advice: data.development_advice,
     ayat_references: data.ayat_references,
+    suitable_traits: {
+      label: 'Sifat yang Sesuai Denganmu',
+      items: data.strengths || []
+    },
+    unsuitable_traits: {
+      label: 'Sifat yang Tidak Sesuai Denganmu',
+      items: data.challenges || []
+    }
   };
 }
 
