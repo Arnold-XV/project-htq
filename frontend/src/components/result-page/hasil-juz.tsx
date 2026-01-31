@@ -101,7 +101,7 @@ export default function HasilJuz({ result }: { result?: any }) {
           </p>
           <div className="space-y-2 mt-4">
             <div className="">
-              <span className="font-bold">Strengths: </span>
+              <span className="font-bold">Sifat yang Sesuai: </span>
               {strengths.length > 0 ? (
                 strengths.map((strength, i) => (
                   <span key={i}>
@@ -114,7 +114,7 @@ export default function HasilJuz({ result }: { result?: any }) {
               )}
             </div>
             <div>
-              <span className="font-bold">Challenges: </span>
+              <span className="font-bold">Sifat yang Tidak Sesuai: </span>
               {challenges.length > 0 ? (
                 challenges.map((challenge, i) => (
                   <span key={i}>

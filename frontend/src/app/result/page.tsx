@@ -6,7 +6,9 @@ import RestartTest from "@/components/result-page/restart-test-button";
 import ShareButton from "@/components/result-page/share-button";
 import KonsultasiCard from "@/components/result-page/konsultasi-card";
 import Footer from "@/components/landing-page/Footer";
-
+import { Button } from "@/components/ui/button";
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
 export default function Result() {
   const [result, setResult] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
@@ -57,9 +59,15 @@ export default function Result() {
   return (
     <>
       <div className="lg:mx-21 md:mx-10 mx-5">
+        <Link href="/">
+          <Button className="bg-neutral-25 text-neutral-800 !rounded-[8px]  mt-8 lg:mb-8 mb-4 shadow-sm hover:scale-105">
+            <ChevronLeft className="mr-2" />
+            <p className="text-sm text-neutral-800 font-bold">Keluar</p>
+          </Button>
+        </Link>
         {loading && <p>Loading result...</p>}
         {error && <p className="text-red-500">Error: {error}</p>}
-        {!loading && !result && <p>Result not found</p>}
+        {!loading && !result && <p>Hasil tidak ditemukan</p>}
 
         {result && <HasilJuz result={result} />}
         <div className="flex flex-row md:justify-end justify-center items-center gap-5 my-8">
