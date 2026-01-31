@@ -87,6 +87,14 @@ export interface SubmitQuizResponse {
       traits: string[];
       strengths: string[];
       weaknesses: string[];
+      suitable_traits?: {
+        label: string;
+        items: string[];
+      };
+      unsuitable_traits?: {
+        label: string;
+        items: string[];
+      };
     };
     completed_at: string;
   };
