@@ -49,45 +49,20 @@ export default function HasilJuz({ result }: { result?: any }) {
       <div className="shadow-sm">
         <div
           className="relative bg-neutral-50 text-neutral-25 rounded-[10px] bg-no-repeat lg:bg-[length:100.94%_376.958%]  lg:bg-[-6px_-13px] bg-[length:100%_auto] bg-[0px_0px] bg-opa 
-            md:bg-[length:100%_250%] md:bg-[0px_-10px] bg-center before:absolute before:inset-0 before:bg-[rgba(61,159,142,0.20)] before:rounded-[10px] px-4 py-2 xxs:pt-6 xxs:pb-6 xs:px-6 xs:pt-6 xs:pb-6 md:px-40 md:py-8 lg:px-50 lg:py-12 xl:pt-17 xl:pb-16 xl:pl-81.5 xl:pr-99"
+            md:bg-[length:100%_250%] md:bg-[0px_-10px] bg-center before:absolute before:inset-0 before:bg-[rgba(61,159,142,0.20)] before:rounded-[10px] before:z-0 px-4 py-6 xxs:pt-10 xxs:pb-6 xs:px-6 xs:pt-17 xs:pb-17 md:px-40 md:py-8 lg:px-50 lg:py-12 xl:pt-17 xl:pb-16 xl:pl-81.5 xl:pr-99"
           style={{
             backgroundImage:
               "linear-gradient(rgba(0,0,0,0.20), rgba(0,0,0,0.10)), url(/image/juz-result-bg.webp)",
           }}
         >
-          <h4 className="font-bold lg:text-[38px] text-[26px] z-1">
+          <h4 className="relative z-10 font-bold lg:text-[38px] text-[26px]">
             Juz {juz} - {name}
           </h4>
-          <p className="lg:text-[22px] text-[16px] z-1">{description}</p>
+          <p className="relative z-10 lg:text-[22px] text-[16px]"></p>
         </div>
         <div className="pl-10.75 pr-8.5 pt-9.25 pb-13">
           <div className="text-center lg:text-[18px] text-[14px] flex flex-col gap-4 items-start">
-            <div className="">
-              <span className="font-bold">Strengths: </span>
-              {strengths.length > 0 ? (
-                strengths.map((strength, i) => (
-                  <span key={i}>
-                    <span>{strength}</span>
-                    {strengths.length - 1 !== i && <span>, </span>}
-                  </span>
-                ))
-              ) : (
-                <p></p>
-              )}
-            </div>
-            <div>
-              <span className="font-bold">Challenges: </span>
-              {challenges.length > 0 ? (
-                challenges.map((challenge, i) => (
-                  <span key={i}>
-                    <span>{challenge}</span>
-                    {challenges.length - 1 !== i && <span>, </span>}
-                  </span>
-                ))
-              ) : (
-                <p></p>
-              )}
-            </div>
+            <p>{description}</p>
           </div>
         </div>
       </div>
@@ -125,17 +100,32 @@ export default function HasilJuz({ result }: { result?: any }) {
             Arah Pengembangan Diri
           </p>
           <div className="space-y-2 mt-4">
-            {personality.development_advice ? (
-              <div className="flex gap-4">
-                <p className="lg:text-[18px] text-[14px]">
-                  {personality.development_advice}
-                </p>
-              </div>
-            ) : null}
-            {/* fallback message */}
-            {!personality.development_advice && (
-              <p className="text-[14px]">Tidak ada saran khusus.</p>
-            )}
+            <div className="">
+              <span className="font-bold">Strengths: </span>
+              {strengths.length > 0 ? (
+                strengths.map((strength, i) => (
+                  <span key={i}>
+                    <span>{strength}</span>
+                    {strengths.length - 1 !== i && <span>, </span>}
+                  </span>
+                ))
+              ) : (
+                <p></p>
+              )}
+            </div>
+            <div>
+              <span className="font-bold">Challenges: </span>
+              {challenges.length > 0 ? (
+                challenges.map((challenge, i) => (
+                  <span key={i}>
+                    <span>{challenge}</span>
+                    {challenges.length - 1 !== i && <span>, </span>}
+                  </span>
+                ))
+              ) : (
+                <p></p>
+              )}
+            </div>
           </div>
         </div>
       </div>

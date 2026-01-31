@@ -615,7 +615,7 @@ export default function TestPage() {
           {pageQs.map((q, idx) => {
             const key = q.id ?? start + idx;
             return (
-              <div key={key} className="pt-12 ">
+              <div key={key} className="lg:pt-12 pt-4">
                 <div className="py-9.25 lg:px-15.25 px-5.5 bg-neutral-25 border-0.5 border-neutral-100 rounded-[15px] shadow-xs">
                   <legend className="mb-5.5 font-bold lg:text-[18px] text-sm">
                     {q.text}
