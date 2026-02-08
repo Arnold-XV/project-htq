@@ -37,11 +37,11 @@ export default function HasilJuz({ result }: { result?: any }) {
   //     : null;
 
   return (
-    <div id="hasil-juz-root" className="flex flex-col gap-7 mt-4.5">
+    <div id="hasil-juz-root" className="flex flex-col lg:gap-8 gap-4 mt-4.5">
       <div className="">
         <div
           className="relative bg-neutral-50 text-neutral-25 rounded-[10px] bg-no-repeat lg:bg-[length:100.94%_376.958%]  lg:bg-[-6px_-13px] bg-[length:100%_auto] bg-[0px_0px] bg-opa 
-            md:bg-[length:100%_250%] md:bg-[0px_-10px] bg-center before:absolute before:inset-0 before:bg-[rgba(61,159,142,0.20)] before:rounded-[10px] before:z-0 px-4 py-6 xxs:pt-10 xxs:pb-6 xs:px-6 xs:pt-17 xs:pb-17 md:px-40 md:py-8 lg:px-50 lg:py-12 xl:pt-17 xl:pb-16 xl:pl-81.5 xl:pr-99"
+            md:bg-[length:100%_250%] md:bg-[0px_-10px] bg-center before:absolute before:inset-0 before:bg-[rgba(61,159,142,0.20)] before:rounded-[10px] before:z-0 px-4 pt-20 pb-6 xxs:pt-32 xxs:pb-8 xs:px-8 xs:pt-34 xs:pb-8 md:px-40 md:py-8 lg:px-50 lg:py-12 xl:pt-17 xl:pb-16 xl:pl-81.5 xl:pr-99"
           style={{
             backgroundImage:
               "linear-gradient(rgba(0,0,0,0.20), rgba(0,0,0,0.10)), url(/image/juz-result-bg.webp)",
@@ -52,7 +52,7 @@ export default function HasilJuz({ result }: { result?: any }) {
           </h4>
           <p className="relative z-10 lg:text-[22px] text-[16px]">{tagline}</p>
         </div>
-        <div className=" pt-9.25 pb-13">
+        <div className=" pt-9.25">
           <div className="lg:text-[18px] text-[14px] flex flex-col gap-4 items-start">
             <p className="lg:text-[22px] text-[16px] text-[#006557] font-bold pb-2 border-b border-neutral-200 w-full">
               Gambaran Umum
