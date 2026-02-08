@@ -358,11 +358,10 @@ async function fetchPersonality(supabase: any, juzNumber: number) {
   return {
     juz_number: data.juz_number,
     name: data.name,
+    tagline: data.tagline,
     description: data.description,
     strengths: data.strengths,
     challenges: data.challenges,
-    development_advice: data.development_advice,
-    ayat_references: data.ayat_references,
     suitable_traits: {
       label: 'Sifat yang Sesuai Denganmu',
       items: data.strengths || []
