@@ -9,17 +9,17 @@ const manfaat = [
   {
     title: "Pemahaman Diri",
     desc: "Temukan kecenderungan kepribadian Anda dan bagaimana Anda merespons situasi dalam kehidupan sehari-hari.",
-    image: "/manfaat-1.png",
+    image: "/manfaat-1r.png",
   },
   {
     title: "Memahami Kekuatan & Tantangan",
     desc: "Dapatkan insight dan nasihat yang dapat membantu Anda dalam perjalanan pengembangan diri.",
-    image: "/manfaat-2.png",
+    image: "/manfaat-2r.png",
   },
   {
     title: "Perspektif Islami",
     desc: "Hasil tes dikaitkan dengan nilai-nilai Islam yang mendukung pertumbuhan spiritual dan karakter.",
-    image: "/manfaat-3.png",
+    image: "/manfaat-3r.png",
   },
 ]
 
@@ -38,7 +38,7 @@ export default function Manfaat() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.3, margin: "-100px" }}
-            whileHover={{ rotate: 2, y: -5, scale: 1.05 }}
+            whileHover={{ scale: 1.05 }}
             transition={{
             type: 'spring',
             stiffness: 300,
@@ -49,9 +49,9 @@ export default function Manfaat() {
             <Image 
               src={item.image} 
               alt={item.title} 
-              className="mx-auto mb-4 object-contain"
-              width={100}
-              height={100}
+              className="mx-auto mb-3 object-contain"
+              width={170}
+              height={170}
             />
             <h3 className="font-plus-jakarta font-semibold md:font-bold text-lg mb-2">{item.title}</h3>
             <p className="font-plus-jakarta text-sm md:text-base text-[var(--foreground)] mb-4">{item.desc}</p>

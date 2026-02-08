@@ -3,7 +3,7 @@ import { Plus_Jakarta_Sans, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { QuestionsProvider } from "../components/test-page/questions-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/react";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],

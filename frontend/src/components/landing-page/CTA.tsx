@@ -10,7 +10,7 @@ export default function CTA() {
   return (
     <section className="px-6 md:px-16 py-20 bg-[var(--color-background)] text-[var(--foreground)] text-center font-plus-jakarta">
       <m.div variants={ctaSection} initial="hidden" whileInView="visible" viewport={{ once: true }}
-      whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+      whileHover={{ scale: 1.01 }} transition={{ type: 'spring', stiffness: 200, damping: 15 }}
       className="relative max-w-8xl mx-auto rounded-3xl overflow-hidden shadow-xl">
         <Image
           src="/hero-bg.jpg"

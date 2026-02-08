@@ -32,7 +32,7 @@ const Hasil = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 max-w-[80rem] mx-auto items-center">
           <m.div variants={fadeUpSection} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3, margin: "-100px" }}
-          whileHover={{ rotate: 2, y: -5, scale: 1.05 }} transition={{ type: 'spring', stiffness: 300, damping: 15 }} 
+          whileHover={{ scale: 1.05 }} transition={{ type: 'spring', stiffness: 300, damping: 15 }} 
           className="flex justify-center lg:justify-end lg:order-2">
             <Image
               src="/hasil-preview.png"
