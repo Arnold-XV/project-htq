@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useQuestions } from "../../../components/test-page/questions-provider";
 import { ChevronLeft } from "lucide-react";
@@ -12,11 +12,14 @@ import ProgressBar from "../../../components/test-page/progress-bar";
 import NavbarTestPage from "@/components/test-page/navbar-test-page";
 
 export default function TestPage() {
+  const questionRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
   const params = useParams();
   const router = useRouter();
   const page = Math.max(1, Number(params.page) || 1);
   const { answers, setAnswers } = useQuestions();
   const [questions, setQuestions] = useState<any[]>([]);
+  const [questionsCount, setQuestionsCount] = useState(0);
+  const [bagian, setBagian] = useState(0);
   const TOTAL_PAGES = 3;
   const start = 0;
 
@@ -101,6 +104,7 @@ export default function TestPage() {
     const fetchQuestionsForLayer = async (layerToFetch: number) => {
       setLoading(true);
       setError(null);
+      setBagian(layerToFetch);
       try {
         let url = `/api/quiz/questions?layer=${layerToFetch}`;
         if (layerToFetch === 3) {
@@ -154,6 +158,7 @@ export default function TestPage() {
           return;
         }
         const fetchedQuestions = normalize(qjson.questions || qjson);
+        setQuestionsCount(fetchedQuestions.length);
         if (mounted) {
           if (
             !fetchedQuestions ||
@@ -188,7 +193,7 @@ export default function TestPage() {
     return () => {
       mounted = false;
     };
-  }, [router, page, branchCategory]);
+  }, [router, page, branchCategory, questions, searchParams]);
 
   useEffect(() => {
     if (page !== 1) return;
@@ -581,8 +586,49 @@ export default function TestPage() {
     }
   };
 
-  const submitQuiz = async () => {
-    await submitLayer();
+  const handleOptionChange = (
+    key: string | number,
+    optionId: string,
+    opt: any,
+  ) => {
+    const numericKey = typeof key === "string" ? parseInt(key, 10) : key;
+    setAnswer(numericKey, optionId);
+
+    if (isTieBreaker) {
+      const val = opt.value ?? opt.option_value ?? null;
+      if (val === "A" || val === "B") {
+        setTiebreakerAnswer(val);
+      } else {
+        const inferred = String(optionId).startsWith("A_")
+          ? "A"
+          : String(optionId).startsWith("B_")
+            ? "B"
+            : null;
+        setTiebreakerAnswer(inferred as "A" | "B" | null);
+      }
+    }
+
+    // Auto-scroll logic
+    setTimeout(() => {
+      const currentIndex = pageQs.findIndex((q) => {
+        const qKey = q.id ?? start + pageQs.indexOf(q);
+        return qKey === key;
+      });
+
+      const nextQuestion = pageQs[currentIndex + 1];
+      if (nextQuestion) {
+        const nextKey = nextQuestion.id ?? start + currentIndex + 1;
+        const nextElement = questionRefs.current[nextKey];
+        if (nextElement) {
+          nextElement.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      } else {
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: "smooth",
+        });
+      }
+    }, 100);
   };
 
   const next = () => {
@@ -598,24 +644,40 @@ export default function TestPage() {
   return (
     <div>
       <NavbarTestPage />
-      <Link href="/">
-        <Button className="bg-neutral-25 text-neutral-800 !rounded-[8px] lg:ml-14.5 ml-4.5 mt-30 mb-8 shadow-sm hover:scale-105">
-          <ChevronLeft className="mr-2" />
-          <p className="text-sm text-neutral-800 font-bold">Keluar</p>
-        </Button>
-      </Link>
+      <div className="flex flex-row gap-4 items-center mx-8"></div>
 
-      <div className="overflow-hidden">
+      <div className="mt-6 relative">
         <div className="lg:mx-36.75 mx-4.5 flex flex-col">
-          <ProgressBar currentPage={page} totalPages={totalPages}></ProgressBar>
+          <Link href="/">
+            <Button className="bg-neutral-25 text-neutral-800 !rounded-[8px] lg:absolute left-8 top-4 max-lg:mb-6 shadow-sm hover:scale-105">
+              <ChevronLeft className="mr-2" />
+              <p className="text-sm text-neutral-800 font-bold">Keluar</p>
+            </Button>
+          </Link>
+          <div className="sticky top-0 z-20 bg-white py-4 rounded-xl">
+            <ProgressBar
+              currentPage={page}
+              totalPages={totalPages}
+              questionsCount={questionsCount}
+              bagian={bagian}
+            ></ProgressBar>
+          </div>
 
           {loading && <p className="text-center mt-6">Loading questions...</p>}
           {error && <p className="text-center text-red-500 mt-6">{error}</p>}
 
           {pageQs.map((q, idx) => {
             const key = q.id ?? start + idx;
+            const numericKey =
+              typeof key === "string" ? parseInt(key, 10) : key;
             return (
-              <div key={key} className="lg:pt-12 pt-4">
+              <div
+                key={key}
+                className="lg:pt-7 pt-4"
+                ref={(el) => {
+                  questionRefs.current[numericKey] = el;
+                }}
+              >
                 <div className="py-9.25 lg:px-15.25 px-5.5 bg-neutral-25 border-0.5 border-neutral-100 rounded-[15px] shadow-xs">
                   <legend className="mb-5.5 font-bold lg:text-[18px] text-sm">
                     {q.text}
@@ -624,7 +686,7 @@ export default function TestPage() {
                     {(q.options ?? []).map((opt: any) => {
                       const optionId = String(opt.id);
                       const optionLabel = opt.label ?? optionId;
-                      const clicked = answers?.[key] === optionId;
+                      const clicked = answers?.[numericKey] === optionId;
                       return (
                         <label
                           key={optionId}
@@ -634,31 +696,13 @@ export default function TestPage() {
                         >
                           <input
                             type="radio"
-                            name={`q-${key}`}
+                            name={`q-${numericKey}`}
                             value={optionId}
-                            checked={answers?.[key] === optionId}
-                            onChange={() => {
-                              setAnswer(key, optionId);
-                              if (isTieBreaker) {
-                                const val =
-                                  opt.value ?? opt.option_value ?? null;
-                                if (val === "A" || val === "B") {
-                                  setTiebreakerAnswer(val);
-                                } else {
-                                  const inferred = String(optionId).startsWith(
-                                    "A_",
-                                  )
-                                    ? "A"
-                                    : String(optionId).startsWith("B_")
-                                      ? "B"
-                                      : null;
-                                  setTiebreakerAnswer(
-                                    inferred as "A" | "B" | null,
-                                  );
-                                }
-                              }
-                            }}
-                            className={`w-6 h-6 flex-shrink-0  ${
+                            checked={answers?.[numericKey] === optionId}
+                            onChange={() =>
+                              handleOptionChange(numericKey, optionId, opt)
+                            }
+                            className={`w-6 h-6 flex-shrink-0 cursor-pointer ${
                               clicked ? "accent-background-2" : ""
                             }`}
                           />

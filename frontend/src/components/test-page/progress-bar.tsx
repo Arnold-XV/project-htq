@@ -3,9 +3,13 @@ import React from "react";
 export default function ProgressBar({
   currentPage,
   totalPages,
+  questionsCount,
+  bagian,
 }: {
   currentPage: number;
   totalPages: number;
+  questionsCount?: number;
+  bagian?: number;
 }) {
   const displayedPage = Math.min(
     Math.max(1, currentPage || 1),
@@ -13,14 +17,14 @@ export default function ProgressBar({
   );
   const percent =
     totalPages && totalPages > 0
-      ? Math.min(100, Math.round((displayedPage / totalPages) * 100))
+      ? Math.min(100, Math.round(((displayedPage - 1) / totalPages) * 100))
       : 100;
 
   return (
-    <div className="w-full">
+    <div className="w-[90%] mx-auto bg-white z-20">
       <div className="flex items-center justify-between mb-3">
         <div className="text-sm font-medium">
-          {displayedPage}/{totalPages}
+          Bagian {displayedPage} dari {totalPages}
         </div>
         <div className="text-sm text-neutral-500">{percent}%</div>
       </div>
@@ -30,6 +34,13 @@ export default function ProgressBar({
           style={{ width: `${percent}%` }}
         />
       </div>
+      {questionsCount !== undefined && (
+        <p className="text-center mt-2 text-sm">
+          Terdapat{" "}
+          <span className="font-bold">{questionsCount} pertanyaan</span> di
+          bagian {bagian !== undefined && bagian === 0 ? bagian + 1 : bagian}
+        </p>
+      )}
     </div>
   );
 }

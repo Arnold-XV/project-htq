@@ -21,7 +21,7 @@ import {
 
 export default function NavbarTestPage() {
   return (
-    <nav className="border-b-[2px] border-[rgba(0,0,0,0.08)] fixed top-0 z-20 w-full bg-white py-[25px] md:px-14.5 px-8">
+    <nav className="border-b-[2px] border-[rgba(0,0,0,0.08)] top-0 w-full bg-white py-4 md:px-14.5 px-8">
       <div className="flex flex-row justify-between">
         <div className="flex flex-row gap-1 items-center">
           <Image src={"/htq-logo.png"} alt="HTQ Logo" width={36} height={35} />
