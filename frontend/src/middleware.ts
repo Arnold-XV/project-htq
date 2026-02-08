@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // If OAuth redirected to root with code or access_token, forward to callback handler
+  // If OAuth redirected to root with code or access_token, forward to API callback handler
   const isRootWithAuthParam =
     request.nextUrl.pathname === "/" &&
     (request.nextUrl.searchParams.has("code") ||
@@ -18,7 +18,7 @@ export async function middleware(request: NextRequest) {
 
   if (isRootWithAuthParam) {
     return NextResponse.redirect(
-      new URL(`/auth/callback${request.nextUrl.search}`, request.url),
+      new URL(`/api/auth/callback${request.nextUrl.search}`, request.url),
     );
   }
 
