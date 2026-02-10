@@ -10,7 +10,7 @@ export default function CTA() {
   return (
     <section className="px-6 md:px-16 py-20 bg-[var(--color-background)] text-[var(--foreground)] text-center font-plus-jakarta">
       <m.div variants={ctaSection} initial="hidden" whileInView="visible" viewport={{ once: true }}
-      whileHover={{ scale: 1.01 }} transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+      whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 200, damping: 15 }}
       className="relative max-w-8xl mx-auto rounded-3xl overflow-hidden shadow-xl">
         <Image
           src="/hero-bg.jpg"
@@ -25,8 +25,9 @@ export default function CTA() {
             Sudah siap mengenal diri?
           </h2>
 
-          <p className="mt-4 text-sm md:text-base font-medium max-w-2xl mx-auto text-[var(--foreground)]">
-            Lorem ipsum dolor sit amet consectetur. Amet non id massa neque. Ullamcorper cras morbi faucibus egestas enim dignissim tincidunt.
+          <p className="mt-4 text-sm md:text-base font-medium max-w-4xl mx-auto text-[var(--foreground)]">
+            Setiap hasil memiliki dinamika emosi, tantangan, dan potensi yang unik.
+            Konsultasi personal membantu kamu memahami makna hasil tes ini serta menyusun langkah pengembangan diri yang lebih selaras dan aplikatif.
           </p>
 
           <button className="mt-8 bg-[var(--foreground)] text-white px-13 py-2.5 rounded-lg cursor-pointer hover:bg-[var(--color-primary-700)] shadow-lg text-sm"
