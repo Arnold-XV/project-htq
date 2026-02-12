@@ -124,6 +124,7 @@ export default function TestPage() {
           }
 
           // Navigate to current layer if different from current page
+          // Only redirect on initial load (page 1) to avoid redirect loops
           if (data.current_layer !== page && page === 1) {
             const targetLayer = data.current_layer;
             if (targetLayer === 3 && data.branch_category) {
@@ -459,11 +460,20 @@ export default function TestPage() {
         } catch {}
       }
 
+      console.log('📥 Submit response:', {
+        completed: json.completed,
+        next_layer: json.next_layer,
+        had_tie: json.had_tie,
+        message: json.message,
+        has_questions: Array.isArray(json.questions),
+      });
+
       // CASE 1: Quiz completed (no tiebreaker) -> navigate to result page
       if (
         json.completed === true ||
         /quiz completed/i.test(json.message || "")
       ) {
+        console.log('✅ CASE 1: Quiz completed, navigating to /result');
         const idToShow = returnedResultId;
         try {
           const payloadToStore = {
@@ -603,6 +613,7 @@ export default function TestPage() {
 
       // CASE 3: Normal next_layer flow (including layer 3 branch)
       if (json.next_layer && typeof json.next_layer === "number") {
+        console.log('✅ CASE 3: next_layer =', json.next_layer);
         const nextLayer = json.next_layer;
         const branchForNext = json.branch_category ?? null;
         const url =
@@ -610,6 +621,7 @@ export default function TestPage() {
             ? `/api/quiz/questions?layer=3&branch=${encodeURIComponent(branchForNext)}`
             : `/api/quiz/questions?layer=${nextLayer}`;
 
+        console.log('🔄 Fetching questions for next layer:', url);
         const qres = await fetch(url, {
           method: "GET",
           credentials: "include",
@@ -641,6 +653,7 @@ export default function TestPage() {
           return;
         }
         const nx = normalize(qjson.questions || qjson);
+        console.log('✅ Questions loaded, navigating to:', nextLayer === 3 && branchForNext ? `/test/3?branch=${branchForNext}` : `/test/${nextLayer}`);
         setQuestions(nx);
         setIsTieBreaker(false);
         if (nextLayer === 3 && branchForNext) {
@@ -651,7 +664,9 @@ export default function TestPage() {
         return;
       }
 
+      // CASE 4: Questions returned directly in response
       if (Array.isArray(json.questions) && json.questions.length > 0) {
+        console.log('✅ CASE 4: Questions in response, loading...');
         const nx = normalize(json.questions);
         setQuestions(nx);
         setIsTieBreaker(false);
@@ -659,6 +674,8 @@ export default function TestPage() {
         return;
       }
 
+      // Fallback: No clear next action
+      console.warn('⚠️ No next_layer or questions found, falling back to /result', json);
       router.push("/result");
     } catch (err) {
       console.error("Submit exception:", err);
