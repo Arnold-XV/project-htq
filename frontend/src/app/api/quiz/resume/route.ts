@@ -47,7 +47,8 @@ export async function GET() {
     const result = results[0];
 
     // Check if quiz is completed
-    if (result.completed_at) {
+    // Must have both completed_at AND final_juz to be truly completed
+    if (result.completed_at && result.final_juz) {
       return NextResponse.json({
         has_quiz: true,
         state: 'completed',
@@ -55,6 +56,11 @@ export async function GET() {
         final_juz: result.final_juz,
         message: 'Quiz already completed. View your result.',
       });
+    }
+
+    // If completed_at exists but no final_juz, it's a bug - treat as in-progress
+    if (result.completed_at && !result.final_juz) {
+      console.warn('⚠️ Bug detected: completed_at set but no final_juz. Treating as in-progress.', result.id);
     }
 
     // Quiz is in progress - determine current layer
