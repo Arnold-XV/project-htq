@@ -39,7 +39,24 @@ export async function GET(request: Request) {
         );
       }
 
-      return NextResponse.json({ result }, { status: 200 });
+      // Fetch personality details if result has final_juz
+      let personality = null;
+      if (result.final_juz) {
+        const { data: personalityData } = await supabase
+          .from('personality_types')
+          .select('*')
+          .eq('juz_number', result.final_juz)
+          .single();
+        
+        personality = personalityData;
+      }
+
+      return NextResponse.json({ 
+        result: {
+          ...result,
+          personality
+        } 
+      }, { status: 200 });
     }
 
     // Get all results for user

@@ -16,9 +16,10 @@ export default function Result() {
 
   useEffect(() => {
     let mounted = true;
-    const loadFromLocal = async () => {
+    const loadResult = async () => {
       setLoading(true);
       try {
+        // First, try localStorage (fastest)
         const raw =
           typeof window !== "undefined"
             ? localStorage.getItem("lastResultPayload")
@@ -36,22 +37,52 @@ export default function Result() {
             };
             if (mounted) {
               setResult(immediateResult);
+              setLoading(false);
             }
             return;
           } catch (e) {
-            if (mounted) {
-              const msg = e instanceof Error ? e.message : String(e);
-              setError(`Invalid lastResultPayload: ${msg}`);
-            }
+            console.error('Failed to parse localStorage:', e);
           }
         }
-        if (mounted) setResult(null);
+
+        // If no localStorage, fetch latest result from API
+        const response = await fetch('/api/quiz/results');
+        if (!response.ok) {
+          throw new Error('Failed to fetch results');
+        }
+
+        const data = await response.json();
+        const results = data.results || [];
+        
+        // Get most recent completed result
+        const latestResult = results.find((r: any) => r.completed_at);
+        
+        if (latestResult && mounted) {
+          // Fetch personality details
+          const personalityResponse = await fetch(
+            `/api/quiz/results?id=${latestResult.id}`
+          );
+          
+          if (personalityResponse.ok) {
+            const personalityData = await personalityResponse.json();
+            setResult(personalityData.result);
+          } else {
+            setResult(latestResult);
+          }
+        } else if (mounted) {
+          setResult(null);
+        }
+      } catch (e) {
+        if (mounted) {
+          const msg = e instanceof Error ? e.message : String(e);
+          setError(`Failed to load result: ${msg}`);
+        }
       } finally {
         if (mounted) setLoading(false);
       }
     };
 
-    loadFromLocal();
+    loadResult();
     return () => {
       mounted = false;
     };
