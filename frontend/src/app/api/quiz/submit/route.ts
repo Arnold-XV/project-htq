@@ -130,7 +130,8 @@ export async function POST(request: Request) {
           neuro_level: neuroLevel,
           branch_category: branchCategory,
         })
-        .eq('id', resultId);
+        .eq('id', resultId)
+        .eq('user_id', user.id); // Security: ensure user owns this result
 
       if (updateError) {
         console.error('Result update error:', updateError);
@@ -195,7 +196,8 @@ export async function POST(request: Request) {
           had_tie: hasTie,
           final_juz: hasTie ? null : topJuz1?.juz, // Only set if no tie
         })
-        .eq('id', resultId);
+        .eq('id', resultId)
+        .eq('user_id', user.id); // Security: ensure user owns this result
 
       if (updateError) {
         console.error('Result update error:', updateError);
@@ -235,7 +237,8 @@ export async function POST(request: Request) {
         await supabase
           .from('quiz_results')
           .update({ completed_at: new Date().toISOString() })
-          .eq('id', resultId);
+          .eq('id', resultId)
+          .eq('user_id', user.id); // Security: ensure user owns this result
 
         return NextResponse.json(
           {
@@ -284,7 +287,8 @@ export async function POST(request: Request) {
           final_juz: finalJuz,
           completed_at: new Date().toISOString(),
         })
-        .eq('id', resultId);
+        .eq('id', resultId)
+        .eq('user_id', user.id); // Security: ensure user owns this result
 
       if (updateError) {
         console.error('Result update error:', updateError);
