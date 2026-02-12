@@ -101,8 +101,8 @@
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
 
-  --breakpoint-xxs: 330px;
-  --breakpoint-xs: 380px;
+  --breakpoint-xxs: 370px;
+  --breakpoint-xs: 420px;
 }
 
 :root {

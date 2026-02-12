@@ -32,13 +32,13 @@ const Hasil = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 max-w-[80rem] mx-auto items-center">
           <m.div variants={fadeUpSection} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3, margin: "-100px" }}
-          whileHover={{ scale: 1.05 }} transition={{ type: 'spring', stiffness: 300, damping: 15 }} 
+          whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300, damping: 15 }} 
           className="flex justify-center lg:justify-end lg:order-2">
             <Image
-              src="/hasil-preview.png"
+              src="/hasil-4e.png"
               alt="Hasil Card Preview"
-              width={500}
-              height={500}
+              width={600}
+              height={600}
               className="mb-10 lg:mb-0"
             />
           </m.div>
