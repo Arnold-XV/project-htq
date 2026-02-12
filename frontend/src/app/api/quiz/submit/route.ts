@@ -69,10 +69,11 @@ export async function POST(request: Request) {
       // Layer 1: Extraversion (data collection only)
       const extraversionScore = options.filter((opt) => opt.option_value === 'E').length;
 
-      // Create new quiz result
+      // Create new quiz result (authenticated user only)
       const resultData: any = {
         user_id: user.id,
         extraversion_score: extraversionScore,
+        completed_at: null, // Explicitly set to NULL (quiz not completed yet)
       };
 
       const { data: result, error: resultError } = await supabase
@@ -84,7 +85,7 @@ export async function POST(request: Request) {
       if (resultError) {
         console.error('Result creation error:', resultError);
         return NextResponse.json(
-          { error: 'Failed to create quiz result' },
+          { error: 'Failed to create quiz result', details: resultError.message },
           { status: 500 }
         );
       }
