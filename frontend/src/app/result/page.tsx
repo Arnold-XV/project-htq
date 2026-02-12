@@ -19,7 +19,47 @@ export default function Result() {
     const loadResult = async () => {
       setLoading(true);
       try {
-        // First, try localStorage (fastest)
+        // First, check if there's an in-progress or completed quiz
+        const resumeResponse = await fetch('/api/quiz/resume', {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        if (resumeResponse.ok) {
+          const resumeData = await resumeResponse.json();
+          
+          // If quiz is in-progress, redirect to continue
+          if (resumeData.state === 'in_progress') {
+            const layer = resumeData.current_layer || 1;
+            let redirectUrl = `/test/${layer}`;
+            
+            if (layer === 3 && resumeData.branch_category) {
+              redirectUrl += `?branch=${resumeData.branch_category}`;
+            } else if (layer === 4 && resumeData.tiebreaker_params) {
+              const { juzA, juzB } = resumeData.tiebreaker_params;
+              redirectUrl += `?juzA=${juzA}&juzB=${juzB}`;
+            }
+            
+            window.location.href = redirectUrl;
+            return;
+          }
+          
+          // If quiz is completed, continue to load result
+          if (resumeData.state === 'completed' && resumeData.result_id) {
+            const resultResponse = await fetch(
+              `/api/quiz/results?id=${resumeData.result_id}`
+            );
+            
+            if (resultResponse.ok && mounted) {
+              const resultData = await resultResponse.json();
+              setResult(resultData.result);
+              setLoading(false);
+              return;
+            }
+          }
+        }
+
+        // Fallback: try localStorage (fastest for fresh submissions)
         const raw =
           typeof window !== "undefined"
             ? localStorage.getItem("lastResultPayload")
@@ -45,7 +85,7 @@ export default function Result() {
           }
         }
 
-        // If no localStorage, fetch latest result from API
+        // Last resort: fetch latest result from API
         const response = await fetch('/api/quiz/results');
         if (!response.ok) {
           throw new Error('Failed to fetch results');

@@ -68,6 +68,82 @@ export default function TestPage() {
   useEffect(() => {
     let mounted = true;
 
+    // Check and resume in-progress quiz from database
+    const checkResumeQuiz = async () => {
+      try {
+        const response = await fetch('/api/quiz/resume', {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          console.log('Resume check failed, starting fresh');
+          return false;
+        }
+
+        const data = await response.json();
+        
+        // If completed quiz exists, redirect to result
+        if (data.state === 'completed' && data.result_id) {
+          console.log('✅ Quiz completed, redirecting to result');
+          router.push(`/result?id=${data.result_id}`);
+          return true;
+        }
+
+        // If in-progress quiz exists, restore state
+        if (data.state === 'in_progress' && data.result_id) {
+          console.log('🔄 Resuming quiz from Layer', data.current_layer);
+          
+          // Restore resultId
+          setResultId(data.result_id);
+          try {
+            localStorage.setItem('quizResultId', data.result_id);
+          } catch {}
+
+          // Restore branch category
+          if (data.branch_category) {
+            setBranchCategory(data.branch_category);
+            try {
+              localStorage.setItem('branchCategory', data.branch_category);
+            } catch {}
+          }
+
+          // If tiebreaker needed (Layer 4)
+          if (data.current_layer === 4 && data.tiebreaker_params) {
+            const { juzA, juzB } = data.tiebreaker_params;
+            try {
+              localStorage.setItem('tiebreaker_juzA', String(juzA));
+              localStorage.setItem('tiebreaker_juzB', String(juzB));
+            } catch {}
+            
+            // Navigate to tiebreaker page
+            if (page !== 4) {
+              router.push(`/test/4?juzA=${juzA}&juzB=${juzB}`);
+              return true;
+            }
+          }
+
+          // Navigate to current layer if different from current page
+          if (data.current_layer !== page && page === 1) {
+            const targetLayer = data.current_layer;
+            if (targetLayer === 3 && data.branch_category) {
+              router.push(`/test/3?branch=${data.branch_category}`);
+            } else {
+              router.push(`/test/${targetLayer}`);
+            }
+            return true;
+          }
+
+          return false;
+        }
+
+        return false;
+      } catch (error) {
+        console.error('Resume check error:', error);
+        return false;
+      }
+    };
+
     const tryLoadPersistedTieBreaker = (): boolean => {
       try {
         const sp = searchParams;
@@ -94,12 +170,6 @@ export default function TestPage() {
       } catch {}
       return false;
     };
-
-    if (tryLoadPersistedTieBreaker()) {
-      return () => {
-        mounted = false;
-      };
-    }
 
     const fetchQuestionsForLayer = async (layerToFetch: number) => {
       setLoading(true);
@@ -181,19 +251,29 @@ export default function TestPage() {
       }
     };
 
-    if (
-      questions.length === 0 ||
-      (page === 3 && questions[0]?.branch_category !== branchCategory)
-    ) {
-      if (page !== 3 || (page === 3 && branchCategory)) {
-        fetchQuestionsForLayer(page);
+    // Main initialization flow
+    const init = async () => {
+      // First check if we should resume from database
+      const shouldReturn = await checkResumeQuiz();
+      if (shouldReturn) {
+        return;
       }
-    }
+
+      // Then try loading persisted tiebreaker
+      if (tryLoadPersistedTieBreaker()) {
+        return;
+      }
+
+      // Finally fetch questions for current layer
+      await fetchQuestionsForLayer(page);
+    };
+
+    init();
 
     return () => {
       mounted = false;
     };
-  }, [router, page, branchCategory, questions, searchParams]);
+  }, [page, branchCategory]);
 
   useEffect(() => {
     if (page !== 1) return;
