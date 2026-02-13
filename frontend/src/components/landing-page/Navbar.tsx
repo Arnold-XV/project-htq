@@ -39,10 +39,10 @@ export default function Navbar() {
               </button>
             </div>
 
-            <div className="flex items-center gap-1.5 text-lg font-medium cursor-pointer text-[var(--foreground)]">
+            {/*<div className="flex items-center gap-1.5 text-lg font-medium cursor-pointer text-[var(--foreground)]">
               <Globe size={25} />
               <span>ID</span>
-            </div>
+            </div>*/}
           </div>
 
           {/* HAMBURGER*/}
@@ -57,10 +57,10 @@ export default function Navbar() {
         {/* MOBILE MENU */}
         {open && (
           <div className="mt-5 flex flex-col gap-4 font-semibold md:hidden text-sm">
-            <div className="flex items-center justify-center gap-2 text-base text-[var(--foreground)]">
+            {/*<div className="flex items-center justify-center gap-2 text-base text-[var(--foreground)]">
               <Globe size={22} />
               <span>ID</span>
-            </div>
+            </div>*/}
             <button
               className="rounded-lg bg-[var(--color-primary-button)] px-6 py-2 text-white shadow-sm mb-3"
               onClick={async () => {await createClient().auth.signInWithOAuth({
