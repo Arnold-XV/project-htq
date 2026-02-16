@@ -60,7 +60,7 @@ export async function GET() {
 
     // If completed_at exists but no final_juz, it's a bug - treat as in-progress
     if (result.completed_at && !result.final_juz) {
-      console.warn('⚠️ Bug detected: completed_at set but no final_juz. Treating as in-progress.', result.id);
+      console.warn('Bug detected: completed_at set but no final_juz. Treating as in-progress.', result.id);
     }
 
     // Quiz is in progress - determine current layer

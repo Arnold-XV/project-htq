@@ -15,7 +15,7 @@ export async function GET(request: Request) {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || origin;
     const callbackUrl = `${baseUrl}/api/auth/callback?next=${next}`;
     
-    console.log('🔵 Initiating OAuth with redirectTo:', callbackUrl);
+    console.log('[OAuth] Initiating OAuth with redirectTo:', callbackUrl);
 
     // Initiate Google OAuth sign in
     const { data, error } = await supabase.auth.signInWithOAuth({
@@ -30,7 +30,7 @@ export async function GET(request: Request) {
     });
 
     if (error) {
-      console.error('❌ Google OAuth error:', error);
+      console.error('[ERROR] Google OAuth error:', error);
       return NextResponse.json(
         { error: error.message },
         { status: 400 }
@@ -47,7 +47,7 @@ export async function GET(request: Request) {
     // Redirect to Google OAuth consent screen
     return NextResponse.redirect(data.url);
   } catch (error: any) {
-    console.error('❌ Unexpected error:', error);
+    console.error('[ERROR] Unexpected error:', error);
     return NextResponse.json(
       { error: error.message || 'Internal server error' },
       { status: 500 }

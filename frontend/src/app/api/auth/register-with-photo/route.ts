@@ -67,7 +67,7 @@ export async function POST(request: Request) {
     // ============================================
     // STEP 2: REGISTER USER (No Photo Yet)
     // ============================================
-    console.log('🔵 Step 1: Registering user...');
+    console.log('[Step 1] Registering user...');
     
     // Generate random password
     const randomPassword = crypto.randomUUID() + crypto.randomUUID();
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
     });
 
     if (authError) {
-      console.error('❌ Auth error:', authError);
+      console.error('[ERROR] Auth error:', authError);
       return NextResponse.json(
         { error: authError.message },
         { status: 400 }
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
     }
 
     const userId = authData.user.id;
-    console.log('✅ Step 1 Complete: User created with ID:', userId);
+    console.log('[Step 1 Complete] User created with ID:', userId);
 
     // Insert into users table (without photo_url initially)
     const { error: profileError } = await supabase
@@ -114,7 +114,7 @@ export async function POST(request: Request) {
       ]);
 
     if (profileError) {
-      console.error('❌ Profile creation error:', profileError);
+      console.error('[ERROR] Profile creation error:', profileError);
       return NextResponse.json(
         { error: 'Failed to create user profile', details: profileError.message },
         { status: 500 }
@@ -128,7 +128,7 @@ export async function POST(request: Request) {
     });
 
     if (sessionError) {
-      console.warn('⚠️ Auto-login failed:', sessionError);
+      console.warn('[WARNING] Auto-login failed:', sessionError);
     }
 
     // ============================================
@@ -137,7 +137,7 @@ export async function POST(request: Request) {
     let photo_url: string | null = null;
 
     if (file) {
-      console.log('🔵 Step 2: Uploading photo...');
+      console.log('[Step 2] Uploading photo...');
 
       // Use authenticated client if session exists, otherwise anon
       const uploadClient = sessionData?.session 
@@ -161,9 +161,9 @@ export async function POST(request: Request) {
         });
 
       if (uploadError) {
-        console.error('❌ Upload error:', uploadError);
+        console.error('[ERROR] Upload error:', uploadError);
         // Don't fail registration if photo upload fails
-        console.warn('⚠️ Photo upload failed, but user registration succeeded');
+        console.warn('[WARNING] Photo upload failed, but user registration succeeded');
       } else {
         // Get public URL
         const { data: { publicUrl } } = uploadClient.storage
@@ -171,7 +171,7 @@ export async function POST(request: Request) {
           .getPublicUrl(filePath);
 
         photo_url = publicUrl;
-        console.log('✅ Step 2 Complete: Photo uploaded:', photo_url);
+        console.log('[Step 2 Complete] Photo uploaded:', photo_url);
 
         // Update user profile with photo URL
         const { error: updateError } = await supabase
@@ -180,13 +180,13 @@ export async function POST(request: Request) {
           .eq('id', userId);
 
         if (updateError) {
-          console.error('❌ Photo URL update error:', updateError);
+          console.error('[ERROR] Photo URL update error:', updateError);
         } else {
-          console.log('✅ Step 3 Complete: Photo URL updated in database');
+          console.log('[Step 3 Complete] Photo URL updated in database');
         }
       }
     } else {
-      console.log('ℹ️ No photo provided, skipping Step 2');
+      console.log('[INFO] No photo provided, skipping Step 2');
     }
 
     // ============================================
@@ -211,7 +211,7 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('💥 Registration error:', error);
+    console.error('[ERROR] Registration error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

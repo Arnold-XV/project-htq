@@ -86,7 +86,7 @@ export async function POST(request: Request) {
       }
     }
 
-    console.log('🔵 Step 1: Updating user profile for:', user.id);
+    console.log('[Step 1] Updating user profile for:', user.id);
 
     // ============================================
     // STEP 2: UPLOAD PHOTO (if provided)
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
     let photo_url: string | null = null;
 
     if (file) {
-      console.log('🔵 Step 2: Uploading photo...');
+      console.log('[Step 2] Uploading photo...');
       
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}-${Date.now()}.${fileExt}`;
@@ -109,7 +109,7 @@ export async function POST(request: Request) {
         });
 
       if (uploadError) {
-        console.error('❌ Upload error:', uploadError);
+        console.error('[ERROR] Upload error:', uploadError);
         return NextResponse.json(
           { error: `Failed to upload photo: ${uploadError.message}` },
           { status: 500 }
@@ -122,15 +122,15 @@ export async function POST(request: Request) {
         .getPublicUrl(filePath);
 
       photo_url = urlData.publicUrl;
-      console.log('✅ Photo uploaded:', photo_url);
+      console.log('[SUCCESS] Photo uploaded:', photo_url);
     }
 
     // ============================================
     // STEP 3: UPSERT USER PROFILE
     // ============================================
-    console.log('🔵 Step 3: Saving profile to database...');
-    console.log('🔍 User ID from auth:', user.id);
-    console.log('🔍 User email from auth:', user.email);
+    console.log('[Step 3] Saving profile to database...');
+    console.log('[DEBUG] User ID from auth:', user.id);
+    console.log('[DEBUG] User email from auth:', user.email);
 
     // First check if row exists
     const { data: existingUser } = await supabase
@@ -139,7 +139,7 @@ export async function POST(request: Request) {
       .eq('id', user.id)
       .single();
 
-    console.log('🔍 Existing user in DB:', existingUser);
+    console.log('[DEBUG] Existing user in DB:', existingUser);
 
     // Use UPDATE instead of UPSERT to avoid INSERT policy conflict
     const { data: userData, error: upsertError } = await supabase
@@ -156,14 +156,14 @@ export async function POST(request: Request) {
       .single();
 
     if (upsertError) {
-      console.error('❌ Database error:', upsertError);
+      console.error('[ERROR] Database error:', upsertError);
       return NextResponse.json(
         { error: `Failed to save profile: ${upsertError.message}` },
         { status: 500 }
       );
     }
 
-    console.log('✅ Profile completed successfully');
+    console.log('[SUCCESS] Profile completed successfully');
 
     // ============================================
     // STEP 4: RETURN SUCCESS
@@ -174,7 +174,7 @@ export async function POST(request: Request) {
     }, { status: 200 });
 
   } catch (error: any) {
-    console.error('❌ Unexpected error:', error);
+    console.error('[ERROR] Unexpected error:', error);
     return NextResponse.json(
       { error: error.message || 'Internal server error' },
       { status: 500 }
@@ -228,7 +228,7 @@ export async function GET(request: Request) {
     }, { status: 200 });
 
   } catch (error: any) {
-    console.error('❌ Error:', error);
+    console.error('[ERROR] Error:', error);
     return NextResponse.json(
       { error: error.message || 'Internal server error' },
       { status: 500 }

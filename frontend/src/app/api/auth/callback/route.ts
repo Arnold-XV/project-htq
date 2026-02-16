@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     const { data: sessionData, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
 
     if (sessionError) {
-      console.error('❌ Session exchange error:', sessionError);
+      console.error('[ERROR] Session exchange error:', sessionError);
       return NextResponse.redirect(`${origin}/login?error=auth_failed`);
     }
 
@@ -27,7 +27,7 @@ export async function GET(request: Request) {
       return NextResponse.redirect(`${origin}/login?error=no_user`);
     }
 
-    console.log('✅ Google OAuth successful for user:', sessionData.user.id);
+    console.log('[SUCCESS] Google OAuth successful for user:', sessionData.user.id);
 
     // ============================================
     // STEP 1: Check if user profile exists
@@ -40,11 +40,11 @@ export async function GET(request: Request) {
 
     // If user doesn't exist or profile incomplete, redirect to register
     if (userError || !existingUser || !existingUser.name || !existingUser.gender || !existingUser.date_of_birth) {
-      console.log('🔵 New user or incomplete profile → /register');
+      console.log('[REDIRECT] New user or incomplete profile -> /register');
       return NextResponse.redirect(`${origin}/register`);
     }
 
-    console.log('✅ Profile complete');
+    console.log('[SUCCESS] Profile complete');
 
     // ============================================
     // STEP 2: Check if user has completed quiz
@@ -60,16 +60,16 @@ export async function GET(request: Request) {
     // If quiz completed, redirect to results (use query param format)
     if (!quizError && quizResults && quizResults.length > 0) {
       const latestResult = quizResults[0];
-      console.log('✅ Quiz already completed → /result?id=' + latestResult.id);
+      console.log('[REDIRECT] Quiz already completed -> /result?id=' + latestResult.id);
       return NextResponse.redirect(`${origin}/result?id=${latestResult.id}`);
     }
 
     // If profile complete but quiz not done, redirect to test
-    console.log('🔵 Profile complete but quiz not done → /test/1');
+    console.log('[REDIRECT] Profile complete but quiz not done -> /test/1');
     return NextResponse.redirect(`${origin}/test/1`);
     
   } catch (error: any) {
-    console.error('❌ Callback error:', error);
+    console.error('[ERROR] Callback error:', error);
     return NextResponse.redirect(`${new URL(request.url).origin}/login?error=server_error`);
   }
 }

@@ -12,15 +12,22 @@ export default function RestartTest() {
     
     setIsDeleting(true);
     try {
-      // Delete in-progress quiz from database
+      // Delete ALL quiz results from database (both completed and in-progress)
       const response = await fetch('/api/quiz/restart', {
         method: 'DELETE',
         credentials: 'include',
       });
 
       if (!response.ok) {
-        console.error('Failed to delete quiz:', await response.text());
+        const errorText = await response.text();
+        console.error('Failed to delete quiz:', errorText);
+        alert('Gagal menghapus data quiz. Silakan coba lagi.');
+        setIsDeleting(false);
+        return;
       }
+
+      const result = await response.json();
+      console.log('✅ Quiz deleted:', result);
 
       // Clear localStorage
       localStorage.removeItem("lastResultPayload");
@@ -30,11 +37,16 @@ export default function RestartTest() {
       localStorage.removeItem("branchCategory");
       localStorage.removeItem("lastTieBreakerQuestions");
       localStorage.removeItem("lastTieBreakerParams");
-    } catch (error) {
-      console.error('Restart error:', error);
-    } finally {
+
+      // Small delay to ensure DB transaction is committed
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       // Redirect to test page
       window.location.href = "/test/1";
+    } catch (error) {
+      console.error('Restart error:', error);
+      alert('Terjadi kesalahan. Silakan refresh halaman dan coba lagi.');
+      setIsDeleting(false);
     }
   }
   

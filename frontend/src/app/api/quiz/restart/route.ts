@@ -18,13 +18,12 @@ export async function DELETE() {
       );
     }
 
-    // Delete ALL in-progress quiz results for this user
-    // (completed_at IS NULL OR final_juz IS NULL)
+    // Delete ALL quiz results for this user (both completed and in-progress)
+    // This allows fresh restart from result page
     const { data: deleted, error: deleteError } = await supabase
       .from('quiz_results')
       .delete()
       .eq('user_id', user.id)
-      .or('completed_at.is.null,final_juz.is.null')
       .select();
 
     if (deleteError) {
@@ -35,12 +34,12 @@ export async function DELETE() {
       );
     }
 
-    console.log(`✅ Deleted ${deleted?.length || 0} in-progress quiz(es) for user ${user.id}`);
+    console.log(`Deleted ${deleted?.length || 0} quiz result(s) for user ${user.id}`);
 
     return NextResponse.json({
       success: true,
       deleted_count: deleted?.length || 0,
-      message: 'In-progress quiz deleted successfully',
+      message: 'Quiz results deleted successfully',
     });
   } catch (error: any) {
     console.error('Restart quiz error:', error);
